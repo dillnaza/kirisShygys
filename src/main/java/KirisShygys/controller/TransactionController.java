@@ -9,13 +9,18 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/transactions")
+@RequestMapping("/api/transactions")
 public class TransactionController {
     @Autowired
     private TransactionService transactionService;
 
+    @PostMapping("/create")
+    public ResponseEntity<Transaction> createTransaction(@RequestBody Transaction transaction) {
+        return ResponseEntity.ok(transactionService.createTransaction(transaction));
+    }
+
     @GetMapping("/account/{accountId}")
-    public ResponseEntity<List<Transaction>> getTransactionsByAccountId(@PathVariable Long accountId) {
+    public ResponseEntity<List<Transaction>> getTransactionsByAccount(@PathVariable Long accountId) {
         return ResponseEntity.ok(transactionService.getTransactionsByAccountId(accountId));
     }
 }

@@ -9,13 +9,18 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/accounts")
+@RequestMapping("/api/accounts")
 public class AccountController {
     @Autowired
     private AccountService accountService;
 
+    @PostMapping("/create")
+    public ResponseEntity<Account> createAccount(@RequestBody Account account) {
+        return ResponseEntity.ok(accountService.createAccount(account));
+    }
+
     @GetMapping("/user/{userId}")
-    public ResponseEntity<List<Account>> getAccountsByUserId(@PathVariable Long userId) {
+    public ResponseEntity<List<Account>> getAccountsByUser(@PathVariable Long userId) {
         return ResponseEntity.ok(accountService.getAccountsByUserId(userId));
     }
 }

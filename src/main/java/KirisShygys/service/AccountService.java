@@ -12,7 +12,11 @@ public class AccountService {
     @Autowired
     private AccountRepository accountRepository;
 
+    public Account createAccount(Account account) {
+        return accountRepository.save(account);
+    }
+
     public List<Account> getAccountsByUserId(Long userId) {
-        return accountRepository.findByUserId(userId);
+        return accountRepository.findByUserUserId(userId);
     }
 }

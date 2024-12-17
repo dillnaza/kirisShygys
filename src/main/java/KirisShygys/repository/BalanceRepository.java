@@ -8,5 +8,6 @@ import java.util.List;
 
 @Repository
 public interface BalanceRepository extends JpaRepository<Balance, Long> {
-    List<Balance> findByUserId(Long userId);
+    List<Balance> findByUser_UserId(Long userId);
+
 }

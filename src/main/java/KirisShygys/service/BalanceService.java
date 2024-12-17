@@ -13,7 +13,7 @@ public class BalanceService {
     private BalanceRepository balanceRepository;
 
     public List<Balance> getBalancesByUserId(Long userId) {
-        return balanceRepository.findByUserId(userId);
+        return balanceRepository.findByUser_UserId(userId);
     }
 }
 
