@@ -1,14 +1,13 @@
 package KirisShygys.entity;
-import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
 
-import java.util.Date;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
+
+import java.math.BigDecimal;
+import java.time.LocalDate;
 
 @Entity
-@Getter
-@Setter
-@Table(name = "Balances")
+@Table(name = "balances")
 public class Balance {
 
     @Id
@@ -20,18 +19,61 @@ public class Balance {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @Column(name = "balance", nullable = false)
-    private Double balance;
+    @NotNull(message = "Balance cannot be null")
+    @Column(name = "balance", nullable = false, precision = 10, scale = 2)
+    private BigDecimal balance;
 
+    @NotNull(message = "Balance date cannot be null")
     @Column(name = "balance_date", nullable = false)
-    @Temporal(TemporalType.DATE)
-    private Date balanceDate;
+    private LocalDate balanceDate;
 
+    @NotNull(message = "Balance type cannot be null")
     @Enumerated(EnumType.STRING)
     @Column(name = "balance_type", nullable = false)
     private BalanceType balanceType;
 
     public enum BalanceType {
         INCOME, EXPENSE, TOTAL
+    }
+
+    // Getters and Setters
+    public Long getBalanceId() {
+        return balanceId;
+    }
+
+    public void setBalanceId(Long balanceId) {
+        this.balanceId = balanceId;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+    public @NotNull(message = "Balance cannot be null") BigDecimal getBalance() {
+        return balance;
+    }
+
+    public void setBalance(BigDecimal balance) {
+        this.balance = balance;
+    }
+
+    public LocalDate getBalanceDate() {
+        return balanceDate;
+    }
+
+    public void setBalanceDate(LocalDate balanceDate) {
+        this.balanceDate = balanceDate;
+    }
+
+    public BalanceType getBalanceType() {
+        return balanceType;
+    }
+
+    public void setBalanceType(BalanceType balanceType) {
+        this.balanceType = balanceType;
     }
 }

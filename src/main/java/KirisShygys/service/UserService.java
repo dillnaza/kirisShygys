@@ -1,24 +1,17 @@
 package KirisShygys.service;
 
+import KirisShygys.dto.UserDTO;
 import KirisShygys.entity.User;
-import KirisShygys.repository.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
-@Service
-public class UserService {
-    @Autowired
-    private UserRepository userRepository;
-
-    public User createUser(User user) {
-        return userRepository.save(user);
-    }
-
-    public User getUserById(Long id) {
-        return userRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("User not found with ID: " + id));
-    }
+public interface UserService {
+    List<UserDTO> getAllUsers();
+    UserDTO getUserById(Long id);
+    UserDTO createUser(UserDTO userDto);
+    UserDTO updateUser(Long id, UserDTO userDto);
+    void deleteUser(Long id);
+    Optional<User> getUserByEmail(String email);
+    User saveUser(User user);
 }
-

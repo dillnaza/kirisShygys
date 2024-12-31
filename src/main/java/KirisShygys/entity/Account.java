@@ -1,12 +1,13 @@
 package KirisShygys.entity;
+
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+
+import java.math.BigDecimal;
 
 @Entity
-@Getter
-@Setter
-@Table(name = "Accounts")
+@Table(name = "accounts")
 public class Account {
 
     @Id
@@ -18,9 +19,44 @@ public class Account {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
+    @NotBlank(message = "Account name cannot be empty")
     @Column(name = "name", nullable = false)
     private String name;
 
-    @Column(name = "cached_balance", nullable = false)
-    private Double cachedBalance;
+    @NotNull(message = "Cached balance cannot be null")
+    @Column(name = "cached_balance", nullable = false, precision = 10, scale = 2)
+    private BigDecimal cachedBalance;
+
+    // Getters and Setters
+    public Long getAccountId() {
+        return accountId;
+    }
+
+    public void setAccountId(Long accountId) {
+        this.accountId = accountId;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public @NotNull(message = "Cached balance cannot be null") BigDecimal getCachedBalance() {
+        return cachedBalance;
+    }
+
+    public void setCachedBalance(BigDecimal cachedBalance) {
+        this.cachedBalance = cachedBalance;
+    }
 }

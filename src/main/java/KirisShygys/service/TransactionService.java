@@ -1,23 +1,13 @@
 package KirisShygys.service;
 
-import KirisShygys.entity.Transaction;
-import KirisShygys.repository.TransactionRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import KirisShygys.dto.TransactionDTO;
 
 import java.util.List;
 
-@Service
-public class TransactionService {
-    @Autowired
-    private TransactionRepository transactionRepository;
-
-    public Transaction createTransaction(Transaction transaction) {
-        return transactionRepository.save(transaction);
-    }
-
-    public List<Transaction> getTransactionsByAccountId(Long accountId) {
-        return transactionRepository.findByAccountAccountId(accountId);
-    }
+public interface TransactionService {
+    List<TransactionDTO> getAllTransactions();
+    TransactionDTO getTransactionById(Long id);
+    TransactionDTO createTransaction(TransactionDTO transactionDto);
+    TransactionDTO updateTransaction(Long id, TransactionDTO transactionDto);
+    void deleteTransaction(Long id);
 }
-

@@ -1,9 +1,8 @@
 package KirisShygys.controller;
 
-import KirisShygys.entity.Transaction;
+import KirisShygys.dto.TransactionDTO;
 import KirisShygys.service.TransactionService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -11,17 +10,33 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/transactions")
 public class TransactionController {
+
     @Autowired
     private TransactionService transactionService;
 
-    @PostMapping("/create")
-    public ResponseEntity<Transaction> createTransaction(@RequestBody Transaction transaction) {
-        return ResponseEntity.ok(transactionService.createTransaction(transaction));
+    @GetMapping
+    public List<TransactionDTO> getAllTransactions() {
+        return transactionService.getAllTransactions();
     }
 
-    @GetMapping("/account/{accountId}")
-    public ResponseEntity<List<Transaction>> getTransactionsByAccount(@PathVariable Long accountId) {
-        return ResponseEntity.ok(transactionService.getTransactionsByAccountId(accountId));
+    @GetMapping("/{id}")
+    public TransactionDTO getTransactionById(@PathVariable Long id) {
+        return transactionService.getTransactionById(id);
+    }
+
+    @PostMapping
+    public TransactionDTO createTransaction(@RequestBody TransactionDTO transactionDto) {
+        return transactionService.createTransaction(transactionDto);
+    }
+
+    @PutMapping("/{id}")
+    public TransactionDTO updateTransaction(@PathVariable Long id, @RequestBody TransactionDTO transactionDto) {
+        return transactionService.updateTransaction(id, transactionDto);
+    }
+
+    @DeleteMapping("/{id}")
+    public void deleteTransaction(@PathVariable Long id) {
+        transactionService.deleteTransaction(id);
     }
 }
 

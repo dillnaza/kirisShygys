@@ -1,22 +1,13 @@
 package KirisShygys.service;
 
-import KirisShygys.entity.Account;
-import KirisShygys.repository.AccountRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import KirisShygys.dto.AccountDTO;
 
 import java.util.List;
 
-@Service
-public class AccountService {
-    @Autowired
-    private AccountRepository accountRepository;
-
-    public Account createAccount(Account account) {
-        return accountRepository.save(account);
-    }
-
-    public List<Account> getAccountsByUserId(Long userId) {
-        return accountRepository.findByUserUserId(userId);
-    }
+public interface AccountService {
+    List<AccountDTO> getAllAccounts();
+    AccountDTO getAccountById(Long id);
+    AccountDTO createAccount(AccountDTO accountDto);
+    AccountDTO updateAccount(Long id, AccountDTO accountDto);
+    void deleteAccount(Long id);
 }
