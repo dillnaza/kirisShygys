@@ -13,7 +13,6 @@ import java.util.Map;
 @Component
 public class JwtUtil {
 
-    // Генерация безопасного ключа
     private final SecretKey SECRET_KEY = Keys.secretKeyFor(SignatureAlgorithm.HS256);
 
     public String generateToken(String subject, int expirationMinutes) {
@@ -22,7 +21,7 @@ public class JwtUtil {
                 .setClaims(claims)
                 .setSubject(subject)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + expirationMinutes * 60 * 1000)) // Время жизни токена
+                .setExpiration(new Date(System.currentTimeMillis() + expirationMinutes * 60 * 1000))
                 .signWith(SECRET_KEY) // Подпись токена безопасным ключом
                 .compact();
     }

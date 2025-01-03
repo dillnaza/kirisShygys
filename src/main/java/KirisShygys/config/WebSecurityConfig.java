@@ -1,4 +1,4 @@
-package KirisShygys.security;
+package KirisShygys.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -12,12 +12,11 @@ public class WebSecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .csrf(AbstractHttpConfigurer::disable) // Отключаем CSRF для тестов
+                .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/**").permitAll() // Разрешаем доступ к маршрутам регистрации и логина
-                        .anyRequest().authenticated() // Остальные маршруты требуют авторизации
+                        .requestMatchers("/api/auth/**").permitAll()
+                        .anyRequest().authenticated()
                 );
-
         return http.build();
     }
 }

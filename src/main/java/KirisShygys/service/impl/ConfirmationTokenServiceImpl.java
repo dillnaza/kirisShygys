@@ -28,17 +28,13 @@ public class ConfirmationTokenServiceImpl implements ConfirmationTokenService {
     @Override
     public ConfirmationToken validateToken(String token) {
         Optional<ConfirmationToken> optionalToken = confirmationTokenRepository.findByToken(token);
-
         if (optionalToken.isEmpty()) {
             throw new IllegalStateException("Invalid or expired confirmation token.");
         }
-
         ConfirmationToken confirmationToken = optionalToken.get();
-
         if (confirmationToken.getExpiresAt().isBefore(LocalDateTime.now())) {
             throw new IllegalStateException("Token has expired.");
         }
-
         return confirmationToken;
     }
 

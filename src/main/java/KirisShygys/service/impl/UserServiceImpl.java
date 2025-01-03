@@ -39,7 +39,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDTO createUser(UserDTO userDto) {
         User user = convertToEntity(userDto);
-        user.setPassword(passwordEncoder.encode(userDto.getPassword())); // Хэшируем пароль
+        user.setPassword(passwordEncoder.encode(userDto.getPassword()));
         userRepository.save(user);
         return convertToDTO(user);
     }
@@ -48,14 +48,11 @@ public class UserServiceImpl implements UserService {
     public UserDTO updateUser(Long id, UserDTO userDto) {
         User existingUser = userRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("User not found with id: " + id));
-
         existingUser.setName(userDto.getName());
         existingUser.setEmail(userDto.getEmail());
-
         if (userDto.getPassword() != null && !userDto.getPassword().isEmpty()) {
             existingUser.setPassword(passwordEncoder.encode(userDto.getPassword()));
         }
-
         userRepository.save(existingUser);
         return convertToDTO(existingUser);
     }
@@ -78,7 +75,6 @@ public class UserServiceImpl implements UserService {
         return userRepository.save(user);
     }
 
-    // Преобразование из User в UserDTO
     private UserDTO convertToDTO(User user) {
         UserDTO userDto = new UserDTO();
         userDto.setId(user.getUserId());
@@ -87,7 +83,6 @@ public class UserServiceImpl implements UserService {
         return userDto;
     }
 
-    // Преобразование из UserDTO в User
     private User convertToEntity(UserDTO userDto) {
         User user = new User();
         user.setName(userDto.getName());
