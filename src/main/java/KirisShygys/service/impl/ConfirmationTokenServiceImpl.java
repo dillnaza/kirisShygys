@@ -19,13 +19,6 @@ public class ConfirmationTokenServiceImpl implements ConfirmationTokenService {
     }
 
     @Override
-    public ConfirmationToken createToken(User user) {
-        String tokenValue = java.util.UUID.randomUUID().toString();
-        ConfirmationToken token = new ConfirmationToken(tokenValue, LocalDateTime.now(), LocalDateTime.now().plusMinutes(15), user);
-        return confirmationTokenRepository.save(token);
-    }
-
-    @Override
     public ConfirmationToken validateToken(String token) {
         Optional<ConfirmationToken> optionalToken = confirmationTokenRepository.findByToken(token);
         if (optionalToken.isEmpty()) {
