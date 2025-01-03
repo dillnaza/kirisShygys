@@ -26,6 +26,9 @@ public class User {
     @Column(name = "password", nullable = false)
     private String password;
 
+    @Column(nullable = false)
+    private boolean isEnabled = false;
+
     // Getters and Setters
     public Long getUserId() {
         return id;
@@ -57,5 +60,13 @@ public class User {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public boolean isEnabled() {
+        return isEnabled;
+    }
+
+    public void setEnabled(boolean enabled) {
+        isEnabled = enabled;
     }
 }
