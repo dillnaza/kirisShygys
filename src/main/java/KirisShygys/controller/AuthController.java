@@ -1,7 +1,9 @@
 package KirisShygys.controller;
 
 import KirisShygys.entity.ConfirmationToken;
+import KirisShygys.entity.PasswordResetToken;
 import KirisShygys.entity.User;
+import KirisShygys.service.PasswordResetService;
 import KirisShygys.util.JwtUtil;
 import KirisShygys.service.UserService;
 import KirisShygys.service.EmailService;
@@ -17,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.HashMap;
 import java.util.Map;
 import java.time.LocalDateTime;
+import java.util.Optional;
 import java.util.UUID;
 
 @RestController
@@ -24,6 +27,7 @@ import java.util.UUID;
 public class AuthController {
 
     private final UserService userService;
+    private final PasswordResetService resetService;
     private final AuthenticationManager authenticationManager;
     private final JwtUtil jwtUtil;
     private final ConfirmationTokenService confirmationTokenService;
@@ -31,10 +35,11 @@ public class AuthController {
     private final PasswordEncoder passwordEncoder;
 
     public AuthController(UserService userService,
-                          AuthenticationManager authenticationManager, JwtUtil jwtUtil, ConfirmationTokenService confirmationTokenService,
+                          PasswordResetService resetService, AuthenticationManager authenticationManager, JwtUtil jwtUtil, ConfirmationTokenService confirmationTokenService,
                           EmailService emailService,
                           PasswordEncoder passwordEncoder) {
         this.userService = userService;
+        this.resetService = resetService;
         this.authenticationManager = authenticationManager;
         this.jwtUtil = jwtUtil;
         this.confirmationTokenService = confirmationTokenService;
@@ -83,8 +88,8 @@ public class AuthController {
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(email, password)
             );
-            String accessToken = jwtUtil.generateToken(authentication.getName(), 15); // Access токен на 15 минут
-            String refreshToken = jwtUtil.generateToken(authentication.getName(), 1440); // Refresh токен на 24 часа
+            String accessToken = jwtUtil.generateToken(authentication.getName(), 15);
+            String refreshToken = jwtUtil.generateToken(authentication.getName(), 1440);
             Map<String, String> tokens = new HashMap<>();
             tokens.put("accessToken", accessToken);
             tokens.put("refreshToken", refreshToken);
@@ -92,5 +97,32 @@ public class AuthController {
         } catch (AuthenticationException e) {
             return ResponseEntity.status(403).body("Invalid email or password");
         }
+    }
+
+    @PostMapping("/reset-password/request")
+    public ResponseEntity<?> requestPasswordReset(@RequestBody Map<String, String> request) {
+        String email = request.get("email");
+
+        Optional<User> userOpt = userService.getUserByEmail(email);
+        if (userOpt.isEmpty()) {
+            return ResponseEntity.badRequest().body("User not found.");
+        }
+        User user = userOpt.get();
+        PasswordResetToken resetToken = resetService.createResetToken(user);
+        String link = "http://localhost:8080/api/auth/reset-password/confirm?token=" + resetToken.getToken();
+        emailService.sendEmail(user.getEmail(), "Reset Password", "Click the link to reset your password: " + link);
+        return ResponseEntity.ok("Password reset link sent to email.");
+    }
+
+    @PostMapping("/reset-password/confirm")
+    public ResponseEntity<?> confirmResetPassword(@RequestParam("token") String token,
+                                                  @RequestBody Map<String, String> request) {
+        String newPassword = request.get("newPassword");
+        PasswordResetToken resetToken = resetService.validateResetToken(token);
+        User user = resetToken.getUser();
+        user.setPassword(passwordEncoder.encode(newPassword));
+        userService.saveUser(user);
+        resetService.deleteResetToken(resetToken);
+        return ResponseEntity.ok("Password updated successfully.");
     }
 }
