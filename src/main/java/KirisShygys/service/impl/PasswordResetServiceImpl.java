@@ -33,17 +33,13 @@ public class PasswordResetServiceImpl implements PasswordResetService {
     @Override
     public PasswordResetToken validateResetToken(String token) {
         Optional<PasswordResetToken> optionalToken = passwordResetTokenRepository.findByToken(token);
-
         if (optionalToken.isEmpty()) {
             throw new IllegalStateException("Invalid or expired password reset token.");
         }
-
         PasswordResetToken resetToken = optionalToken.get();
-
         if (resetToken.getExpiresAt().isBefore(LocalDateTime.now())) {
             throw new IllegalStateException("Token has expired.");
         }
-
         return resetToken;
     }
 

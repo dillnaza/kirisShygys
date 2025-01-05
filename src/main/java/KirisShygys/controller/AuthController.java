@@ -50,7 +50,7 @@ public class AuthController {
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody User user) {
         if (userService.getUserByEmail(user.getEmail()).isPresent()) {
-            return ResponseEntity.badRequest().body("Email is already in use");
+            return ResponseEntity.badRequest().body(Map.of("message", "Email is already in use"));
         }
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         User savedUser = userService.saveUser(user);
@@ -69,60 +69,72 @@ public class AuthController {
 
     @GetMapping("/confirm")
     public ResponseEntity<?> confirmEmail(@RequestParam("token") String token) {
-        ConfirmationToken confirmationToken = confirmationTokenService.validateToken(token);
-        if (confirmationToken == null) {
-            return ResponseEntity.badRequest().body("Invalid or expired token");
+        try {
+            ConfirmationToken confirmationToken = confirmationTokenService.validateToken(token);
+            if (confirmationToken == null) {
+                return ResponseEntity.badRequest().body(Map.of("message", "Invalid or expired token"));
+            }
+            User user = confirmationToken.getUser();
+            user.setEnabled(true);
+            userService.saveUser(user);
+            confirmationTokenService.deleteToken(confirmationToken);
+            return ResponseEntity.ok(Map.of("message", "Email confirmed successfully."));
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(Map.of("message", "An unexpected error occurred."));
         }
-        User user = confirmationToken.getUser();
-        user.setEnabled(true);
-        userService.saveUser(user);
-        confirmationTokenService.deleteToken(confirmationToken);
-        return ResponseEntity.ok("Email confirmed successfully. You can now log in at /login.");
     }
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody Map<String, String> loginRequest) {
         String email = loginRequest.get("email");
         String password = loginRequest.get("password");
+        if (email == null || password == null) {
+            return ResponseEntity.badRequest().body(Map.of("message", "Email and password must be provided."));
+        }
         try {
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(email, password)
             );
             String accessToken = jwtUtil.generateToken(authentication.getName(), 15);
             String refreshToken = jwtUtil.generateToken(authentication.getName(), 1440);
-            Map<String, String> tokens = new HashMap<>();
-            tokens.put("accessToken", accessToken);
-            tokens.put("refreshToken", refreshToken);
-            return ResponseEntity.ok(tokens);
+            return ResponseEntity.ok(Map.of(
+                    "accessToken", accessToken,
+                    "refreshToken", refreshToken
+            ));
         } catch (AuthenticationException e) {
-            return ResponseEntity.status(403).body("Invalid email or password");
+            return ResponseEntity.status(403).body(Map.of("message", "Invalid credentials."));
         }
     }
 
     @PostMapping("/reset-password/request")
     public ResponseEntity<?> requestPasswordReset(@RequestBody Map<String, String> request) {
         String email = request.get("email");
-
         Optional<User> userOpt = userService.getUserByEmail(email);
-        if (userOpt.isEmpty()) {
-            return ResponseEntity.badRequest().body("User not found.");
+        if (userOpt.isPresent()) {
+            User user = userOpt.get();
+            PasswordResetToken resetToken = resetService.createResetToken(user);
+            String link = "http://localhost:8080/api/auth/reset-password/confirm?token=" + resetToken.getToken();
+            emailService.sendEmail(user.getEmail(), "Reset Password", "Click the link to reset your password: " + link);
         }
-        User user = userOpt.get();
-        PasswordResetToken resetToken = resetService.createResetToken(user);
-        String link = "http://localhost:8080/api/auth/reset-password/confirm?token=" + resetToken.getToken();
-        emailService.sendEmail(user.getEmail(), "Reset Password", "Click the link to reset your password: " + link);
-        return ResponseEntity.ok("Password reset link sent to email.");
+        return ResponseEntity.ok(Map.of("message", "If the email exists, a reset link will be sent to it."));
     }
 
     @PostMapping("/reset-password/confirm")
     public ResponseEntity<?> confirmResetPassword(@RequestParam("token") String token,
                                                   @RequestBody Map<String, String> request) {
         String newPassword = request.get("newPassword");
-        PasswordResetToken resetToken = resetService.validateResetToken(token);
-        User user = resetToken.getUser();
-        user.setPassword(passwordEncoder.encode(newPassword));
-        userService.saveUser(user);
-        resetService.deleteResetToken(resetToken);
-        return ResponseEntity.ok("Password updated successfully.");
+        try {
+            PasswordResetToken resetToken = resetService.validateResetToken(token);
+            if (resetToken == null) {
+                return ResponseEntity.badRequest().body(Map.of("message", "Invalid or expired token"));
+            }
+            User user = resetToken.getUser();
+            user.setPassword(passwordEncoder.encode(newPassword));
+            userService.saveUser(user);
+            resetService.deleteResetToken(resetToken);
+            return ResponseEntity.ok(Map.of("message", "Password updated successfully."));
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(Map.of("message", "An unexpected error occurred."));
+        }
     }
 }
