@@ -33,7 +33,7 @@ public class WebSecurityConfig {
                 )
                 .oauth2Login(oauth -> oauth
                         .loginPage("/login")
-                        .defaultSuccessUrl("/api/auth/oauth2/success", true)
+                        .defaultSuccessUrl("/api/auth/oauth2/authenticate", true)
                 );
         return http.build();
     }

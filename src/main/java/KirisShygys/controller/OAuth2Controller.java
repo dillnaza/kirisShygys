@@ -25,8 +25,8 @@ public class OAuth2Controller {
         this.jwtUtil = jwtUtil;
     }
 
-    @GetMapping("/success")
-    public ResponseEntity<?> handleGoogleLogin(@AuthenticationPrincipal OAuth2User oauth2User) {
+    @GetMapping("/authenticate")
+    public ResponseEntity<?> authenticate(@AuthenticationPrincipal OAuth2User oauth2User) {
         if (oauth2User != null) {
             String email = oauth2User.getAttribute("email");
             String name = oauth2User.getAttribute("name");
@@ -50,28 +50,6 @@ public class OAuth2Controller {
                     accessToken,
                     refreshToken
             ));
-        }
-        return ResponseEntity.status(401).body("Authentication failed or user data not available.");
-    }
-
-    @GetMapping("/google-login")
-    public ResponseEntity<?> googleLogin(@AuthenticationPrincipal OAuth2User oauth2User) {
-        if (oauth2User != null) {
-            String email = oauth2User.getAttribute("email");
-            String name = oauth2User.getAttribute("name");
-            Optional<User> existingUser = userService.getUserByEmail(email);
-            if (existingUser.isPresent()) {
-                User user = existingUser.get();
-                String accessToken = jwtUtil.generateToken(user.getEmail(), 15); // 15 минут
-                String refreshToken = jwtUtil.generateToken(user.getEmail(), 1440); // 24 часа
-                return ResponseEntity.ok(new OAuth2Response(
-                        user.getName(),
-                        user.getEmail(),
-                        accessToken,
-                        refreshToken
-                ));
-            }
-            return ResponseEntity.status(404).body("User not registered with Google.");
         }
         return ResponseEntity.status(401).body("Authentication failed or user data not available.");
     }
