@@ -21,7 +21,6 @@ public class Category {
     @OneToMany(mappedBy = "category", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Transaction> transactions;
 
-    // Getters and Setters
     public Long getCategoryId() {
         return categoryId;
     }

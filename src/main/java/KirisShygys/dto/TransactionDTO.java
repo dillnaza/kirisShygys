@@ -11,7 +11,6 @@ public class TransactionDTO {
     private Long categoryId;
     private String datetime;
 
-    // Getters and Setters
     public Long getId() {
         return id;
     }

@@ -36,7 +36,6 @@ public class Balance {
         INCOME, EXPENSE, TOTAL
     }
 
-    // Getters and Setters
     public Long getBalanceId() {
         return balanceId;
     }

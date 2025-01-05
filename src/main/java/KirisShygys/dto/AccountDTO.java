@@ -9,7 +9,6 @@ public class AccountDTO {
     private BigDecimal cachedBalance;
     private Long userId;
 
-    // Getters and Setters
     public Long getId() {
         return id;
     }

@@ -10,7 +10,6 @@ public class BalanceDTO {
     private String balanceDate;
     private Balance.BalanceType balanceType;
 
-    // Getters and Setters
     public Long getId() {
         return id;
     }

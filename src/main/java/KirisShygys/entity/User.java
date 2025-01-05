@@ -29,7 +29,6 @@ public class User {
     @Column(nullable = false)
     private boolean isEnabled = false;
 
-    // Getters and Setters
     public Long getUserId() {
         return id;
     }

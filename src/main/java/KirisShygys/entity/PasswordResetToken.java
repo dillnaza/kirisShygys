@@ -23,7 +23,6 @@ public class PasswordResetToken {
     @Column(nullable = false)
     private LocalDateTime expiresAt;
 
-    // Конструкторы
     public PasswordResetToken() {
     }
 
@@ -34,7 +33,6 @@ public class PasswordResetToken {
         this.user = user;
     }
 
-    // Геттеры и сеттеры
     public Long getId() {
         return id;
     }

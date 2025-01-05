@@ -27,7 +27,6 @@ public class Account {
     @Column(name = "cached_balance", nullable = false, precision = 10, scale = 2)
     private BigDecimal cachedBalance;
 
-    // Getters and Setters
     public Long getAccountId() {
         return accountId;
     }

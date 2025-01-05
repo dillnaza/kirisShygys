@@ -44,7 +44,6 @@ public class Transaction {
         INCOME, EXPENSE
     }
 
-    // Getters and Setters
     public Long getTransactionId() {
         return transactionId;
     }
