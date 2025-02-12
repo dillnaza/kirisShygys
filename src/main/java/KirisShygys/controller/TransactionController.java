@@ -1,8 +1,10 @@
 package KirisShygys.controller;
 
 import KirisShygys.dto.TransactionDTO;
+import KirisShygys.entity.Transaction;
+import KirisShygys.entity.User;
 import KirisShygys.service.TransactionService;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -11,17 +13,19 @@ import java.util.List;
 @RequestMapping("/api/transactions")
 public class TransactionController {
 
-    @Autowired
-    private TransactionService transactionService;
+    private final TransactionService transactionService;
 
-    @GetMapping
-    public List<TransactionDTO> getAllTransactions() {
-        return transactionService.getAllTransactions();
+    public TransactionController(TransactionService transactionService) {
+        this.transactionService = transactionService;
     }
 
-    @GetMapping("/{id}")
-    public TransactionDTO getTransactionById(@PathVariable Long id) {
-        return transactionService.getTransactionById(id);
+    @GetMapping("/{userId}")
+    public ResponseEntity<List<Transaction>> getUserTransactions(@PathVariable Long userId) {
+        User user = new User();
+        user.setUserId(userId);
+
+        List<Transaction> transactions = transactionService.getUserTransactions(user);
+        return ResponseEntity.ok(transactions);
     }
 
     @PostMapping
@@ -39,4 +43,3 @@ public class TransactionController {
         transactionService.deleteTransaction(id);
     }
 }
-

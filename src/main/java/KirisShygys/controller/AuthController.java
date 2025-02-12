@@ -49,7 +49,7 @@ public class AuthController {
 
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody User user) {
-        if (userService.getUserByEmail(user.getEmail()).isPresent()) {
+        if (userService.findByEmail(user.getEmail()).isPresent()) {
             return ResponseEntity.badRequest().body(Map.of("message", "Email is already in use"));
         }
         user.setPassword(passwordEncoder.encode(user.getPassword()));
@@ -109,7 +109,7 @@ public class AuthController {
     @PostMapping("/reset-password/request")
     public ResponseEntity<?> requestPasswordReset(@RequestBody Map<String, String> request) {
         String email = request.get("email");
-        Optional<User> userOpt = userService.getUserByEmail(email);
+        Optional<User> userOpt = userService.findByEmail(email);
         if (userOpt.isPresent()) {
             User user = userOpt.get();
             PasswordResetToken resetToken = resetService.createResetToken(user);

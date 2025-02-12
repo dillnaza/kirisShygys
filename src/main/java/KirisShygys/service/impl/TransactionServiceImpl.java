@@ -2,29 +2,26 @@ package KirisShygys.service.impl;
 
 import KirisShygys.dto.TransactionDTO;
 import KirisShygys.entity.Transaction;
+import KirisShygys.entity.User;
 import KirisShygys.repository.TransactionRepository;
 import KirisShygys.service.TransactionService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class TransactionServiceImpl implements TransactionService {
 
-    @Autowired
-    private TransactionRepository transactionRepository;
+    private final TransactionRepository transactionRepository;
 
-    @Override
-    public List<TransactionDTO> getAllTransactions() {
-        return transactionRepository.findAll().stream().map(this::mapToDto).collect(Collectors.toList());
+    public TransactionServiceImpl(TransactionRepository transactionRepository) {
+        this.transactionRepository = transactionRepository;
     }
 
     @Override
-    public TransactionDTO getTransactionById(Long id) {
-        return mapToDto(transactionRepository.findById(id).orElseThrow(() -> new RuntimeException("Transaction not found")));
+    public List<Transaction> getUserTransactions(User user) {
+        return transactionRepository.findByAccount_User(user);
     }
 
     @Override

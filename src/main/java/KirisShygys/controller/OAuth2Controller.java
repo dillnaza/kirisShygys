@@ -30,7 +30,7 @@ public class OAuth2Controller {
         if (oauth2User != null) {
             String email = oauth2User.getAttribute("email");
             String name = oauth2User.getAttribute("name");
-            Optional<User> existingUser = userService.getUserByEmail(email);
+            Optional<User> existingUser = userService.findByEmail(email);
             User user;
             if (existingUser.isPresent()) {
                 user = existingUser.get();

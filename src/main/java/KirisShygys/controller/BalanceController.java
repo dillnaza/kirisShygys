@@ -1,42 +1,53 @@
 package KirisShygys.controller;
 
-import KirisShygys.dto.BalanceDTO;
+import KirisShygys.entity.Transaction;
+import KirisShygys.entity.User;
 import KirisShygys.service.BalanceService;
-import org.springframework.beans.factory.annotation.Autowired;
+import KirisShygys.service.TransactionService;
+import KirisShygys.service.UserService;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
+import java.security.Principal;
+import java.util.HashMap;
 import java.util.List;
-
+import java.util.Map;
+import java.util.Optional;
 
 @RestController
-@RequestMapping("/api/balances")
+@RequestMapping("/api/balance")
 public class BalanceController {
 
-    @Autowired
-    private BalanceService balanceService;
+    private final BalanceService balanceService;
+    private final TransactionService transactionService;
+    private final UserService userService;
 
-    @GetMapping
-    public List<BalanceDTO> getAllBalances() {
-        return balanceService.getAllBalances();
+    public BalanceController(BalanceService balanceService, TransactionService transactionService, UserService userService) {
+        this.balanceService = balanceService;
+        this.transactionService = transactionService;
+        this.userService = userService;
     }
 
-    @GetMapping("/{id}")
-    public BalanceDTO getBalanceById(@PathVariable Long id) {
-        return balanceService.getBalanceById(id);
-    }
+    @GetMapping("/dashboard")
+    public ResponseEntity<Map<String, Object>> getUserDashboard(Principal principal) {
+        Optional<User> user = userService.findByEmail(principal.getName());
 
-    @PostMapping
-    public BalanceDTO createBalance(@RequestBody BalanceDTO balanceDto) {
-        return balanceService.createBalance(balanceDto);
-    }
+        if (user.isEmpty()) {
+            return ResponseEntity.status(404).body(Map.of("error", "User not found"));
+        }
 
-    @PutMapping("/{id}")
-    public BalanceDTO updateBalance(@PathVariable Long id, @RequestBody BalanceDTO balanceDto) {
-        return balanceService.updateBalance(id, balanceDto);
-    }
+        BigDecimal totalBalance = balanceService.getUserTotalBalance(user.get());
+        BigDecimal totalIncome = balanceService.getUserIncome(user.get());
+        BigDecimal totalExpenses = balanceService.getUserExpenses(user.get());
+        List<Transaction> transactions = transactionService.getUserTransactions(user.get());
 
-    @DeleteMapping("/{id}")
-    public void deleteBalance(@PathVariable Long id) {
-        balanceService.deleteBalance(id);
+        Map<String, Object> response = new HashMap<>();
+        response.put("balance", totalBalance);
+        response.put("income", totalIncome);
+        response.put("expenses", totalExpenses);
+        response.put("transactions", transactions);
+
+        return ResponseEntity.ok(response);
     }
 }

@@ -30,34 +30,6 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserDTO getUserById(Long id) {
-        User user = userRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("User not found with id: " + id));
-        return convertToDTO(user);
-    }
-
-    @Override
-    public UserDTO createUser(UserDTO userDto) {
-        User user = convertToEntity(userDto);
-        user.setPassword(passwordEncoder.encode(userDto.getPassword()));
-        userRepository.save(user);
-        return convertToDTO(user);
-    }
-
-    @Override
-    public UserDTO updateUser(Long id, UserDTO userDto) {
-        User existingUser = userRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("User not found with id: " + id));
-        existingUser.setName(userDto.getName());
-        existingUser.setEmail(userDto.getEmail());
-        if (userDto.getPassword() != null && !userDto.getPassword().isEmpty()) {
-            existingUser.setPassword(passwordEncoder.encode(userDto.getPassword()));
-        }
-        userRepository.save(existingUser);
-        return convertToDTO(existingUser);
-    }
-
-    @Override
     public void deleteUser(Long id) {
         if (!userRepository.existsById(id)) {
             throw new RuntimeException("User not found with id: " + id);
@@ -66,7 +38,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Optional<User> getUserByEmail(String email) {
+    public Optional<User> findByEmail(String email) {
         return userRepository.findByEmail(email);
     }
 

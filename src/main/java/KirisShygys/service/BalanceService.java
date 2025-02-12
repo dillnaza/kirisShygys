@@ -1,13 +1,11 @@
 package KirisShygys.service;
 
-import KirisShygys.dto.BalanceDTO;
+import KirisShygys.entity.User;
 
-import java.util.List;
+import java.math.BigDecimal;
 
 public interface BalanceService {
-    List<BalanceDTO> getAllBalances();
-    BalanceDTO getBalanceById(Long id);
-    BalanceDTO createBalance(BalanceDTO balanceDto);
-    BalanceDTO updateBalance(Long id, BalanceDTO balanceDto);
-    void deleteBalance(Long id);
+    BigDecimal getUserTotalBalance(User user);
+    BigDecimal getUserIncome(User user);
+    BigDecimal getUserExpenses(User user);
 }

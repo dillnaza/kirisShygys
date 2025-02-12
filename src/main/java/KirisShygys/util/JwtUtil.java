@@ -22,7 +22,7 @@ public class JwtUtil {
                 .setSubject(subject)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + expirationMinutes * 60 * 1000))
-                .signWith(SECRET_KEY) // Подпись токена безопасным ключом
+                .signWith(SECRET_KEY)
                 .compact();
     }
 
