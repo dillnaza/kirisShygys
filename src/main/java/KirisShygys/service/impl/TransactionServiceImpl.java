@@ -8,6 +8,8 @@ import KirisShygys.service.TransactionService;
 import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -20,8 +22,8 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     @Override
-    public List<Transaction> getUserTransactions(User user) {
-        return transactionRepository.findByAccount_User(user);
+    public List<Transaction> getUserTransactions(User user, LocalDateTime dateFrom, LocalDateTime dateTo) {
+        return transactionRepository.findByUserAndDatetimeBetween(user, dateFrom, dateTo);
     }
 
     @Override

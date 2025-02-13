@@ -36,7 +36,6 @@ public class AccountServiceImpl implements AccountService {
     public AccountDTO updateAccount(Long id, AccountDTO accountDto) {
         Account existingAccount = accountRepository.findById(id).orElseThrow(() -> new RuntimeException("Account not found"));
         existingAccount.setName(accountDto.getName());
-        existingAccount.setCachedBalance(accountDto.getCachedBalance());
         return mapToDto(accountRepository.save(existingAccount));
     }
 
@@ -49,15 +48,12 @@ public class AccountServiceImpl implements AccountService {
         AccountDTO dto = new AccountDTO();
         dto.setId(account.getAccountId());
         dto.setName(account.getName());
-        dto.setCachedBalance(account.getCachedBalance());
-        dto.setUserId(account.getUser().getUserId());
         return dto;
     }
 
     private Account mapToEntity(AccountDTO dto) {
         Account account = new Account();
         account.setName(dto.getName());
-        account.setCachedBalance(dto.getCachedBalance());
         return account;
     }
 }

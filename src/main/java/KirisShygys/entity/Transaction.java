@@ -15,12 +15,16 @@ public class Transaction {
     private Long transactionId;
 
     @ManyToOne
-    @JoinColumn(name = "category_id")
+    @JoinColumn(name = "category_id", nullable = false)
     private Category category;
 
     @ManyToOne
     @JoinColumn(name = "account_id", nullable = false)
     private Account account;
+
+    @ManyToOne
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
 
     @NotNull(message = "Datetime cannot be null")
     @Column(name = "datetime", nullable = false)
@@ -106,5 +110,13 @@ public class Transaction {
 
     public void setType(TransactionType type) {
         this.type = type;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
     }
 }

@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
 import java.security.Principal;
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -32,22 +33,18 @@ public class BalanceController {
     @GetMapping("/dashboard")
     public ResponseEntity<Map<String, Object>> getUserDashboard(Principal principal) {
         Optional<User> user = userService.findByEmail(principal.getName());
-
         if (user.isEmpty()) {
             return ResponseEntity.status(404).body(Map.of("error", "User not found"));
         }
-
         BigDecimal totalBalance = balanceService.getUserTotalBalance(user.get());
         BigDecimal totalIncome = balanceService.getUserIncome(user.get());
         BigDecimal totalExpenses = balanceService.getUserExpenses(user.get());
-        List<Transaction> transactions = transactionService.getUserTransactions(user.get());
-
+        List<Transaction> transactions = transactionService.getUserTransactions(user.get(), LocalDateTime.now().minusMonths(3), LocalDateTime.now());
         Map<String, Object> response = new HashMap<>();
         response.put("balance", totalBalance);
         response.put("income", totalIncome);
         response.put("expenses", totalExpenses);
         response.put("transactions", transactions);
-
         return ResponseEntity.ok(response);
     }
 }

@@ -5,6 +5,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 @Entity
 @Table(name = "accounts")
@@ -15,17 +16,12 @@ public class Account {
     @Column(name = "account_id")
     private Long accountId;
 
-    @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
-
     @NotBlank(message = "Account name cannot be empty")
     @Column(name = "name", nullable = false)
     private String name;
 
-    @NotNull(message = "Cached balance cannot be null")
-    @Column(name = "cached_balance", nullable = false, precision = 10, scale = 2)
-    private BigDecimal cachedBalance;
+    @OneToMany(mappedBy = "account", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Transaction> transactions;
 
     public Long getAccountId() {
         return accountId;
@@ -33,14 +29,6 @@ public class Account {
 
     public void setAccountId(Long accountId) {
         this.accountId = accountId;
-    }
-
-    public User getUser() {
-        return user;
-    }
-
-    public void setUser(User user) {
-        this.user = user;
     }
 
     public String getName() {
@@ -51,11 +39,11 @@ public class Account {
         this.name = name;
     }
 
-    public @NotNull(message = "Cached balance cannot be null") BigDecimal getCachedBalance() {
-        return cachedBalance;
+    public List<Transaction> getTransactions() {
+        return transactions;
     }
 
-    public void setCachedBalance(BigDecimal cachedBalance) {
-        this.cachedBalance = cachedBalance;
+    public void setTransactions(List<Transaction> transactions) {
+        this.transactions = transactions;
     }
 }
