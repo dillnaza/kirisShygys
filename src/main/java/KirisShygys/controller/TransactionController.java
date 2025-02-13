@@ -4,7 +4,6 @@ import KirisShygys.dto.TransactionDTO;
 import KirisShygys.entity.Transaction;
 import KirisShygys.entity.User;
 import KirisShygys.service.TransactionService;
-import java.time.LocalDate;
 
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
@@ -31,14 +30,12 @@ public class TransactionController {
 
         User user = new User();
         user.setUserId(userId);
-
         if (dateFrom == null) {
             dateFrom = LocalDateTime.now().minusMonths(3);
         }
         if (dateTo == null) {
             dateTo = LocalDateTime.now();
         }
-
         List<Transaction> transactions = transactionService.getUserTransactions(user, dateFrom, dateTo);
         return ResponseEntity.ok(transactions);
     }

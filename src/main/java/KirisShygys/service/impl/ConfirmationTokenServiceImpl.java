@@ -1,7 +1,6 @@
 package KirisShygys.service.impl;
 
 import KirisShygys.entity.ConfirmationToken;
-import KirisShygys.entity.User;
 import KirisShygys.repository.ConfirmationTokenRepository;
 import KirisShygys.service.ConfirmationTokenService;
 import org.springframework.stereotype.Service;

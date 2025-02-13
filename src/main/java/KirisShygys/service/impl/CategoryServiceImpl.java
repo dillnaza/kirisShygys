@@ -22,11 +22,6 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public CategoryDTO getCategoryById(Long id) {
-        return mapToDto(categoryRepository.findById(id).orElseThrow(() -> new RuntimeException("Category not found")));
-    }
-
-    @Override
     public CategoryDTO createCategory(CategoryDTO categoryDto) {
         Category category = mapToEntity(categoryDto);
         return mapToDto(categoryRepository.save(category));
