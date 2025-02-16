@@ -22,6 +22,11 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
+    public AccountDTO getAccountById(Long id) {
+        return mapToDto(accountRepository.findById(id).orElseThrow(() -> new RuntimeException("Account not found")));
+    }
+
+    @Override
     public AccountDTO createAccount(AccountDTO accountDto) {
         Account account = mapToEntity(accountDto);
         return mapToDto(accountRepository.save(account));

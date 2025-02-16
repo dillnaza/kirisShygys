@@ -30,12 +30,14 @@ public class TransactionController {
 
         User user = new User();
         user.setUserId(userId);
+
         if (dateFrom == null) {
             dateFrom = LocalDateTime.now().minusMonths(3);
         }
         if (dateTo == null) {
             dateTo = LocalDateTime.now();
         }
+
         List<Transaction> transactions = transactionService.getUserTransactions(user, dateFrom, dateTo);
         return ResponseEntity.ok(transactions);
     }

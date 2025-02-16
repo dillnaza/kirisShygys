@@ -4,7 +4,6 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 
 @Entity
 @Table(name = "balances")
@@ -22,10 +21,6 @@ public class Balance {
     @NotNull(message = "Balance cannot be null")
     @Column(name = "balance", nullable = false, precision = 10, scale = 2)
     private BigDecimal balance;
-
-    @NotNull(message = "Balance date cannot be null")
-    @Column(name = "balance_date", nullable = false)
-    private LocalDate balanceDate;
 
     @NotNull(message = "Balance type cannot be null")
     @Enumerated(EnumType.STRING)
@@ -58,14 +53,6 @@ public class Balance {
 
     public void setBalance(BigDecimal balance) {
         this.balance = balance;
-    }
-
-    public LocalDate getBalanceDate() {
-        return balanceDate;
-    }
-
-    public void setBalanceDate(LocalDate balanceDate) {
-        this.balanceDate = balanceDate;
     }
 
     public BalanceType getBalanceType() {

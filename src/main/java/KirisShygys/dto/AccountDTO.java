@@ -6,7 +6,6 @@ public class AccountDTO {
 
     private Long id;
     private String name;
-    private BigDecimal cachedBalance;
     private Long userId;
 
     public Long getId() {
@@ -23,14 +22,6 @@ public class AccountDTO {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public BigDecimal getCachedBalance() {
-        return cachedBalance;
-    }
-
-    public void setCachedBalance(BigDecimal cachedBalance) {
-        this.cachedBalance = cachedBalance;
     }
 
     public Long getUserId() {

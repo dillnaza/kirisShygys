@@ -19,6 +19,11 @@ public class AccountController {
         return accountService.getAllAccounts();
     }
 
+    @GetMapping("/{id}")
+    public AccountDTO getAccountById(@PathVariable Long id) {
+        return accountService.getAccountById(id);
+    }
+
     @PostMapping
     public AccountDTO createAccount(@RequestBody AccountDTO accountDto) {
         return accountService.createAccount(accountDto);
