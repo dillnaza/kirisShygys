@@ -1,11 +1,11 @@
 package KirisShygys.controller;
 
-import KirisShygys.dto.UserDTO;
 import KirisShygys.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/users")
@@ -14,13 +14,15 @@ public class UserController {
     @Autowired
     private UserService userService;
 
-    @GetMapping
-    public List<UserDTO> getAllUsers() {
-        return userService.getAllUsers();
-    }
-
     @DeleteMapping("/{id}")
     public void deleteUser(@PathVariable Long id) {
         userService.deleteUser(id);
     }
+
+    @GetMapping("/exists")
+    public ResponseEntity<?> checkUserExists(@RequestParam String email) {
+        boolean exists = userService.findByEmail(email).isPresent();
+        return ResponseEntity.ok().body(Map.of("exists", exists));
+    }
+
 }
