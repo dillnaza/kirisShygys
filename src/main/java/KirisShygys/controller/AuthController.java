@@ -49,7 +49,7 @@ public class AuthController {
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody User user) {
         if (userService.findByEmail(user.getEmail()).isPresent()) {
-            return ResponseEntity.badRequest().body(Map.of("message", "Email is already in use"));
+            return ResponseEntity.badRequest().body(Map.of("error", "Email is already in use"));
         }
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         User savedUser = userService.saveUser(user);
@@ -63,7 +63,10 @@ public class AuthController {
         confirmationTokenService.saveConfirmationToken(confirmationToken);
         String link = "http://localhost:8080/api/auth/confirm?token=" + token;
         emailService.sendEmail(savedUser.getEmail(), "Confirm your email", "Click the link to confirm your email: " + link);
-        return ResponseEntity.ok("Registration successful. Check your email to confirm your account.");
+        return ResponseEntity.ok(Map.of(
+                "message", "Registration successful. Check your email to confirm your account.",
+                "confirmationLink", link
+        ));
     }
 
     @GetMapping("/confirm")
@@ -90,6 +93,11 @@ public class AuthController {
         if (email == null || password == null) {
             return ResponseEntity.badRequest().body(Map.of("message", "Email and password must be provided."));
         }
+        Optional<User> optionalUser = userService.findByEmail(email);
+        if (optionalUser.isEmpty()) {
+            return ResponseEntity.status(401).body(Map.of("message", "Invalid email or password."));
+        }
+        User user = optionalUser.get();
         try {
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(email, password)
@@ -100,8 +108,10 @@ public class AuthController {
                     "accessToken", accessToken,
                     "refreshToken", refreshToken
             ));
-        } catch (AuthenticationException e) {
-            return ResponseEntity.status(403).body(Map.of("message", "Invalid credentials."));
+        } catch (org.springframework.security.authentication.DisabledException e) {
+            return ResponseEntity.status(403).body(Map.of("message", "Email is not verified. Please verify your email."));
+        } catch (org.springframework.security.authentication.BadCredentialsException e) {
+            return ResponseEntity.status(401).body(Map.of("message", "Invalid email or password."));
         }
     }
 
