@@ -129,7 +129,7 @@ public class AuthController {
     }
 
     @PostMapping("/reset-password/confirm")
-    public ResponseEntity<?> confirmResetPassword(@RequestParam("token") String token,
+    public ResponseEntity<?> ResetPassword(@RequestParam("token") String token,
                                                   @RequestBody Map<String, String> request) {
         String newPassword = request.get("newPassword");
         try {
