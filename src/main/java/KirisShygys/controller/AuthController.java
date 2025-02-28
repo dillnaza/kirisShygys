@@ -8,7 +8,9 @@ import KirisShygys.util.JwtUtil;
 import KirisShygys.service.UserService;
 import KirisShygys.service.EmailService;
 import KirisShygys.service.ConfirmationTokenService;
+import jakarta.mail.internet.MimeMessage;
 import org.springframework.http.ResponseEntity;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -123,7 +125,9 @@ public class AuthController {
             User user = userOpt.get();
             PasswordResetToken resetToken = resetService.createResetToken(user);
             String link = "kirisShygys://reset-password?token=" + resetToken.getToken();
-            emailService.sendEmail(user.getEmail(), "Reset Password", "Click the link to reset your password: " + link);
+            String htmlContent = "<p>Click <a href=\"" + link + "\">here</a> to reset your password.</p>"
+                    + "<p><b>" + link + "</b></p>";
+            emailService.sendHtmlEmail(user.getEmail(), "Reset Password", htmlContent);
         }
         return ResponseEntity.ok(Map.of("message", "If the email exists, a reset link will be sent to it."));
     }
