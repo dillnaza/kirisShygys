@@ -125,8 +125,8 @@ public class AuthController {
             User user = userOpt.get();
             PasswordResetToken resetToken = resetService.createResetToken(user);
             String link = "kirisShygys://reset-password?token=" + resetToken.getToken();
-            String htmlContent = "<p>Click <a href=\"" + link + "\">here</a> to reset your password.</p>"
-                    + "<p><b>" + link + "</b></p>";
+            String htmlContent = "<p>Click <a href=\"" + link + "\" style=\"color: blue; text-decoration: underline;\">here</a> to reset your password.</p>"
+                    + "<p><a href=\"" + link + "\">" + link + "</a></p>";
             emailService.sendHtmlEmail(user.getEmail(), "Reset Password", htmlContent);
         }
         return ResponseEntity.ok(Map.of("message", "If the email exists, a reset link will be sent to it."));
