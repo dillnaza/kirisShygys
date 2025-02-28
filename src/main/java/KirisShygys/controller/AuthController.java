@@ -122,7 +122,7 @@ public class AuthController {
         if (userOpt.isPresent()) {
             User user = userOpt.get();
             PasswordResetToken resetToken = resetService.createResetToken(user);
-            String link = "http://localhost:8080/api/auth/reset-password/confirm?token=" + resetToken.getToken();
+            String link = "kirisShygys://reset-password?token=" + resetToken.getToken();
             emailService.sendEmail(user.getEmail(), "Reset Password", "Click the link to reset your password: " + link);
         }
         return ResponseEntity.ok(Map.of("message", "If the email exists, a reset link will be sent to it."));
