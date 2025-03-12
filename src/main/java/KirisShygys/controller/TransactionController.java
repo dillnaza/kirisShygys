@@ -22,26 +22,6 @@ public class TransactionController {
         this.transactionService = transactionService;
     }
 
-    @GetMapping("/{userId}")
-    public ResponseEntity<List<Transaction>> getUserTransactions(
-            @PathVariable Long userId,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDateTime dateFrom,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDateTime dateTo) {
-
-        User user = new User();
-        user.setUserId(userId);
-
-        if (dateFrom == null) {
-            dateFrom = LocalDateTime.now().minusMonths(3);
-        }
-        if (dateTo == null) {
-            dateTo = LocalDateTime.now();
-        }
-
-        List<Transaction> transactions = transactionService.getUserTransactions(user, dateFrom, dateTo);
-        return ResponseEntity.ok(transactions);
-    }
-
     @PostMapping
     public TransactionDTO createTransaction(@RequestBody TransactionDTO transactionDto) {
         return transactionService.createTransaction(transactionDto);

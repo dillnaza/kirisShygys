@@ -3,6 +3,7 @@ package KirisShygys.entity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
@@ -23,15 +24,23 @@ public class Transaction {
     private Account account;
 
     @ManyToOne
+    @JoinColumn(name = "tag_id", nullable = false)
+    private Tag tag;
+
+    @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
+
+    @NotNull(message = "Amount cannot be null")
+    @Column(name = "amount", nullable = false)
+    private BigDecimal amount;
 
     @NotNull(message = "Datetime cannot be null")
     @Column(name = "datetime", nullable = false)
     private LocalDateTime datetime;
 
-    @Column(name = "tags")
-    private String tags;
+
+
 
     @Column(name = "place")
     private String place;
@@ -72,20 +81,28 @@ public class Transaction {
         this.account = account;
     }
 
+    public Tag getTag() {
+        return tag;
+    }
+
+    public void setTag(Tag tag) {
+        this.tag = tag;
+    }
+
+    public BigDecimal getAmount() {
+        return amount;
+    }
+
+    public void setAmount(BigDecimal amount) {
+        this.amount = amount;
+    }
+
     public LocalDateTime getDatetime() {
         return datetime;
     }
 
     public void setDatetime(LocalDateTime datetime) {
         this.datetime = datetime;
-    }
-
-    public String getTags() {
-        return tags;
-    }
-
-    public void setTags(String tags) {
-        this.tags = tags;
     }
 
     public String getPlace() {

@@ -1,59 +1,77 @@
 package KirisShygys.service.impl;
 
-import KirisShygys.dto.AccountDTO;
+
 import KirisShygys.entity.Account;
+import KirisShygys.entity.User;
 import KirisShygys.repository.AccountRepository;
+import KirisShygys.repository.UserRepository;
 import KirisShygys.service.AccountService;
-import org.springframework.beans.factory.annotation.Autowired;
+import KirisShygys.util.JwtUtil;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.stream.Collectors;
+
 
 @Service
 public class AccountServiceImpl implements AccountService {
 
-    @Autowired
-    private AccountRepository accountRepository;
+    private final AccountRepository accountRepository;
+    private final UserRepository userRepository;
+    private final JwtUtil jwtUtil;
 
-    @Override
-    public List<AccountDTO> getAllAccounts() {
-        return accountRepository.findAll().stream().map(this::mapToDto).collect(Collectors.toList());
+    public AccountServiceImpl(AccountRepository accountRepository, UserRepository userRepository, JwtUtil jwtUtil) {
+        this.accountRepository = accountRepository;
+        this.userRepository = userRepository;
+        this.jwtUtil = jwtUtil;
+    }
+
+    private User getAuthenticatedUser(String token) {
+        String email = jwtUtil.extractUsername(token);
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
     }
 
     @Override
-    public AccountDTO getAccountById(Long id) {
-        return mapToDto(accountRepository.findById(id).orElseThrow(() -> new RuntimeException("Account not found")));
+    public List<Account> getAccounts(String token) {
+        User user = getAuthenticatedUser(token);
+        return accountRepository.findByUser(user);
     }
 
     @Override
-    public AccountDTO createAccount(AccountDTO accountDto) {
-        Account account = mapToEntity(accountDto);
-        return mapToDto(accountRepository.save(account));
+    @Transactional
+    public Account createAccount(String token, Account account) {
+        User user = getAuthenticatedUser(token);
+        account.setUser(user);
+        return accountRepository.save(account);
     }
 
     @Override
-    public AccountDTO updateAccount(Long id, AccountDTO accountDto) {
-        Account existingAccount = accountRepository.findById(id).orElseThrow(() -> new RuntimeException("Account not found"));
-        existingAccount.setName(accountDto.getName());
-        return mapToDto(accountRepository.save(existingAccount));
+    @Transactional
+    public Account updateAccount(String token, Long id, Account updatedAccount) {
+        User user = getAuthenticatedUser(token);
+        Account account = accountRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Account not found"));
+
+        if (!account.getUser().getUserId().equals(user.getUserId())) {
+            throw new RuntimeException("Forbidden");
+        }
+
+        account.setName(updatedAccount.getName());
+        return accountRepository.save(account);
     }
 
     @Override
-    public void deleteAccount(Long id) {
-        accountRepository.deleteById(id);
-    }
+    @Transactional
+    public void deleteAccount(String token, Long id) {
+        User user = getAuthenticatedUser(token);
+        Account account = accountRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Account not found"));
 
-    private AccountDTO mapToDto(Account account) {
-        AccountDTO dto = new AccountDTO();
-        dto.setId(account.getAccountId());
-        dto.setName(account.getName());
-        return dto;
-    }
+        if (!account.getUser().getUserId().equals(user.getUserId())) {
+            throw new RuntimeException("Forbidden");
+        }
 
-    private Account mapToEntity(AccountDTO dto) {
-        Account account = new Account();
-        account.setName(dto.getName());
-        return account;
+        accountRepository.delete(account);
     }
 }

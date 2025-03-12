@@ -1,8 +1,8 @@
 package KirisShygys.controller;
 
-import KirisShygys.dto.AccountDTO;
+import KirisShygys.entity.Account;
 import KirisShygys.service.AccountService;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -11,31 +11,32 @@ import java.util.List;
 @RequestMapping("/api/accounts")
 public class AccountController {
 
-    @Autowired
-    private AccountService accountService;
+    private final AccountService accountService;
 
-    @GetMapping
-    public List<AccountDTO> getAllAccounts() {
-        return accountService.getAllAccounts();
+
+    public AccountController(AccountService accountService) {
+        this.accountService = accountService;
+
     }
 
-    @GetMapping("/{id}")
-    public AccountDTO getAccountById(@PathVariable Long id) {
-        return accountService.getAccountById(id);
+    @GetMapping
+    public ResponseEntity<List<Account>> getAccounts(@RequestHeader("Authorization") String token) {
+        return ResponseEntity.ok(accountService.getAccounts(token.replace("Bearer ", "")));
     }
 
     @PostMapping
-    public AccountDTO createAccount(@RequestBody AccountDTO accountDto) {
-        return accountService.createAccount(accountDto);
+    public ResponseEntity<Account> createAccount(@RequestHeader("Authorization") String token, @RequestBody Account account) {
+        return ResponseEntity.ok(accountService.createAccount(token.replace("Bearer ", ""), account));
     }
 
     @PutMapping("/{id}")
-    public AccountDTO updateAccount(@PathVariable Long id, @RequestBody AccountDTO accountDto) {
-        return accountService.updateAccount(id, accountDto);
+    public ResponseEntity<Account> updateAccount(@RequestHeader("Authorization") String token, @PathVariable Long id, @RequestBody Account updatedAccount) {
+        return ResponseEntity.ok(accountService.updateAccount(token.replace("Bearer ", ""), id, updatedAccount));
     }
 
     @DeleteMapping("/{id}")
-    public void deleteAccount(@PathVariable Long id) {
-        accountService.deleteAccount(id);
+    public ResponseEntity<Void> deleteAccount(@RequestHeader("Authorization") String token, @PathVariable Long id) {
+        accountService.deleteAccount(token.replace("Bearer ", ""), id);
+        return ResponseEntity.noContent().build();
     }
 }

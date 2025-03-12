@@ -4,52 +4,35 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 
-import java.util.List;
-
 @Entity
-@Table(name = "categories")
-public class Category {
+@Table(name = "tags")
+public class Tag {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "category_id")
-    private Long categoryId;
+    @Column(name = "tag_id")
+    private Long tagId;
 
-    @NotBlank(message = "Category name cannot be empty")
+    @NotBlank(message = "Tag name cannot be empty")
     @Column(name = "name", nullable = false)
     private String name;
-
-    @ManyToOne
-    @JoinColumn(name = "parent_id")
-    private Category parentCategory;
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     @JsonIgnore
     private User user;
 
-
-    public Long getCategoryId() {
-        return categoryId;
+    public Long getTagId() {
+        return tagId;
     }
-
-    public void setCategoryId(Long categoryId) {
-        this.categoryId = categoryId;
+    public void setTagId(Long tagId) {
+        this.tagId = tagId;
     }
-
     public String getName() {
         return name;
     }
-
     public void setName(String name) {
         this.name = name;
-    }
-
-    public Category getParentCategory() {
-        return parentCategory;
-    }
-    public void setParentCategory(Category parentCategory) {
-        this.parentCategory = parentCategory;
     }
 
     public User getUser() {
