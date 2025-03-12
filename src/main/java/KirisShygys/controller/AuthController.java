@@ -125,8 +125,21 @@ public class AuthController {
             User user = userOpt.get();
             PasswordResetToken resetToken = resetService.createResetToken(user);
             String link = "kirisShygys://reset-password?token=" + resetToken.getToken();
-            String htmlContent = "<p>Click <a href=\"" + link + "\" style=\"color: blue; text-decoration: underline;\">here</a> to reset your password.</p>"
-                    + "<p><a href=\"" + link + "\">" + link + "</a></p>";
+            String htmlContent = "<div style=\"font-family: Arial, sans-serif; max-width: 600px; padding: 20px; border: 1px solid #ddd; border-radius: 8px;\">" +
+                    "<h2 style=\"color: #333;\">Password Reset Request</h2>" +
+                    "<p>We received a request to reset your password. If you made this request, click the button below to proceed:</p>" +
+                    "<div style=\"text-align: center; margin: 20px 0;\">" +
+                    "<a href=\"" + link + "\" " +
+                    "style=\"background-color: #007bff; color: #fff; padding: 12px 20px; text-decoration: none; border-radius: 5px; display: inline-block;\">" +
+                    "Reset Password</a>" +
+                    "</div>" +
+                    "<p>If you did not request this, please ignore this email. Your password will remain unchanged.</p>" +
+                    "<p style=\"color: #888; font-size: 12px;\">If the button above does not work, you can use this link: <br>" +
+                    "<a href=\"" + link + "\" style=\"color: #007bff;\">" + link + "</a>" +
+                    "</p>" +
+                    "<hr style=\"border: none; border-top: 1px solid #ddd;\">" +
+                    "<p style=\"font-size: 12px; color: #888;\">This is an automated email, please do not reply.</p>" +
+                    "</div>";
             emailService.sendHtmlEmail(user.getEmail(), "Reset Password", htmlContent);
         }
         return ResponseEntity.ok(Map.of("message", "If the email exists, a reset link will be sent to it."));
@@ -134,7 +147,7 @@ public class AuthController {
 
     @PostMapping("/reset-password/confirm")
     public ResponseEntity<?> ResetPassword(@RequestParam("token") String token,
-                                                  @RequestBody Map<String, String> request) {
+                                           @RequestBody Map<String, String> request) {
         String newPassword = request.get("newPassword");
         try {
             PasswordResetToken resetToken = resetService.validateResetToken(token);
