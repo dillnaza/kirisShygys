@@ -2,6 +2,7 @@ package KirisShygys.config;
 
 import KirisShygys.filter.JwtAuthenticationFilter;
 import KirisShygys.util.JwtUtil;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpStatus;
@@ -20,6 +21,7 @@ public class WebSecurityConfig {
 
     private final JwtUtil jwtUtil;
 
+    @Autowired
     public WebSecurityConfig(JwtUtil jwtUtil) {
         this.jwtUtil = jwtUtil;
     }
@@ -42,10 +44,6 @@ public class WebSecurityConfig {
                         .requestMatchers("/api/auth/**", "/api/users/exists").permitAll()
                         .requestMatchers("/api/balance/**").authenticated()
                         .anyRequest().authenticated()
-                )
-                .oauth2Login(oauth -> oauth
-                        .loginPage("/login")
-                        .defaultSuccessUrl("/api/auth/oauth2/authenticate", true)
                 )
                 .exceptionHandling(ex -> ex
                         .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)) // Отключает редиректы
