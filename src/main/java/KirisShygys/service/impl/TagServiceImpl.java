@@ -1,8 +1,10 @@
 package KirisShygys.service.impl;
 
-
 import KirisShygys.entity.Tag;
 import KirisShygys.entity.User;
+import KirisShygys.exception.ForbiddenException;
+import KirisShygys.exception.NotFoundException;
+import KirisShygys.exception.UnauthorizedException;
 import KirisShygys.repository.TagRepository;
 import KirisShygys.repository.UserRepository;
 import KirisShygys.service.TagService;
@@ -11,7 +13,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-
 
 @Service
 public class TagServiceImpl implements TagService {
@@ -27,9 +28,13 @@ public class TagServiceImpl implements TagService {
     }
 
     private User getAuthenticatedUser(String token) {
+        if (token == null || token.isEmpty()) {
+            throw new UnauthorizedException("Missing authentication token");
+        }
+
         String email = jwtUtil.extractUsername(token);
         return userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new UnauthorizedException("Invalid or expired token"));
     }
 
     @Override
@@ -51,10 +56,10 @@ public class TagServiceImpl implements TagService {
     public Tag updateTag(String token, Long id, Tag updatedTag) {
         User user = getAuthenticatedUser(token);
         Tag tag = tagRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Tag not found"));
+                .orElseThrow(() -> new NotFoundException("Tag with ID " + id + " not found"));
 
         if (!tag.getUser().getUserId().equals(user.getUserId())) {
-            throw new RuntimeException("Forbidden");
+            throw new ForbiddenException("You do not have permission to modify this tag");
         }
 
         tag.setName(updatedTag.getName());
@@ -66,10 +71,10 @@ public class TagServiceImpl implements TagService {
     public void deleteTag(String token, Long id) {
         User user = getAuthenticatedUser(token);
         Tag tag = tagRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Tag not found"));
+                .orElseThrow(() -> new NotFoundException("Tag with ID " + id + " not found"));
 
         if (!tag.getUser().getUserId().equals(user.getUserId())) {
-            throw new RuntimeException("Forbidden");
+            throw new ForbiddenException("You do not have permission to delete this tag");
         }
 
         tagRepository.delete(tag);

@@ -1,8 +1,10 @@
 package KirisShygys.service.impl;
 
-
 import KirisShygys.entity.Account;
 import KirisShygys.entity.User;
+import KirisShygys.exception.ForbiddenException;
+import KirisShygys.exception.NotFoundException;
+import KirisShygys.exception.UnauthorizedException;
 import KirisShygys.repository.AccountRepository;
 import KirisShygys.repository.UserRepository;
 import KirisShygys.service.AccountService;
@@ -11,7 +13,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-
 
 @Service
 public class AccountServiceImpl implements AccountService {
@@ -27,9 +28,13 @@ public class AccountServiceImpl implements AccountService {
     }
 
     private User getAuthenticatedUser(String token) {
+        if (token == null || token.isEmpty()) {
+            throw new UnauthorizedException("Missing authentication token");
+        }
+
         String email = jwtUtil.extractUsername(token);
         return userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new UnauthorizedException("Invalid or expired token"));
     }
 
     @Override
@@ -51,10 +56,10 @@ public class AccountServiceImpl implements AccountService {
     public Account updateAccount(String token, Long id, Account updatedAccount) {
         User user = getAuthenticatedUser(token);
         Account account = accountRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Account not found"));
+                .orElseThrow(() -> new NotFoundException("Account with ID " + id + " not found"));
 
         if (!account.getUser().getUserId().equals(user.getUserId())) {
-            throw new RuntimeException("Forbidden");
+            throw new ForbiddenException("You do not have permission to modify this account");
         }
 
         account.setName(updatedAccount.getName());
@@ -66,10 +71,10 @@ public class AccountServiceImpl implements AccountService {
     public void deleteAccount(String token, Long id) {
         User user = getAuthenticatedUser(token);
         Account account = accountRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Account not found"));
+                .orElseThrow(() -> new NotFoundException("Account with ID " + id + " not found"));
 
         if (!account.getUser().getUserId().equals(user.getUserId())) {
-            throw new RuntimeException("Forbidden");
+            throw new ForbiddenException("You do not have permission to delete this account");
         }
 
         accountRepository.delete(account);

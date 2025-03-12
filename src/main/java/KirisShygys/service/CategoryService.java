@@ -1,13 +1,12 @@
 package KirisShygys.service;
 
-import KirisShygys.dto.CategoryDTO;
-
+import KirisShygys.entity.Category;
 import java.util.List;
 
 public interface CategoryService {
-    List<CategoryDTO> getAllCategories();
-    CategoryDTO getCategoryById(Long id);
-    CategoryDTO createCategory(CategoryDTO categoryDto);
-    CategoryDTO updateCategory(Long id, CategoryDTO categoryDto);
-    void deleteCategory(Long id);
+    List<Category> getCategories(String token);
+    Category getCategoryById(String token, Long id);
+    Category createCategory(String token, Category category);
+    Category updateCategory(String token, Long id, Category category);
+    void deleteCategory(String token, Long id);
 }

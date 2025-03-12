@@ -1,59 +1,91 @@
 package KirisShygys.service.impl;
 
-import KirisShygys.dto.CategoryDTO;
 import KirisShygys.entity.Category;
+import KirisShygys.entity.User;
+import KirisShygys.exception.ForbiddenException;
+import KirisShygys.exception.NotFoundException;
+import KirisShygys.exception.UnauthorizedException;
 import KirisShygys.repository.CategoryRepository;
+import KirisShygys.repository.UserRepository;
 import KirisShygys.service.CategoryService;
-import org.springframework.beans.factory.annotation.Autowired;
+import KirisShygys.util.JwtUtil;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class CategoryServiceImpl implements CategoryService {
 
-    @Autowired
-    private CategoryRepository categoryRepository;
+    private final CategoryRepository categoryRepository;
+    private final UserRepository userRepository;
+    private final JwtUtil jwtUtil;
 
-    @Override
-    public List<CategoryDTO> getAllCategories() {
-        return categoryRepository.findAll().stream().map(this::mapToDto).collect(Collectors.toList());
+    public CategoryServiceImpl(CategoryRepository categoryRepository, UserRepository userRepository, JwtUtil jwtUtil) {
+        this.categoryRepository = categoryRepository;
+        this.userRepository = userRepository;
+        this.jwtUtil = jwtUtil;
+    }
+
+    private User getAuthenticatedUser(String token) {
+        if (token == null || token.isEmpty()) {
+            throw new UnauthorizedException("Missing authentication token");
+        }
+
+        String email = jwtUtil.extractUsername(token);
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new UnauthorizedException("Invalid or expired token"));
     }
 
     @Override
-    public CategoryDTO getCategoryById(Long id) {
-        return mapToDto(categoryRepository.findById(id).orElseThrow(() -> new RuntimeException("Category not found")));
+    public List<Category> getCategories(String token) {
+        User user = getAuthenticatedUser(token);
+        return categoryRepository.findByUserAndParentCategoryIsNull(user);
     }
 
     @Override
-    public CategoryDTO createCategory(CategoryDTO categoryDto) {
-        Category category = mapToEntity(categoryDto);
-        return mapToDto(categoryRepository.save(category));
+    public Category getCategoryById(String token, Long id) {
+        User user = getAuthenticatedUser(token);
+        return categoryRepository.findByCategoryIdAndUser(id, user)
+                .orElseThrow(() -> new NotFoundException("Category with ID " + id + " not found"));
     }
 
     @Override
-    public CategoryDTO updateCategory(Long id, CategoryDTO categoryDto) {
-        Category existingCategory = categoryRepository.findById(id).orElseThrow(() -> new RuntimeException("Category not found"));
-        existingCategory.setName(categoryDto.getName());
-        return mapToDto(categoryRepository.save(existingCategory));
+    @Transactional
+    public Category createCategory(String token, Category category) {
+        User user = getAuthenticatedUser(token);
+        category.setUser(user);
+        return categoryRepository.save(category);
     }
 
     @Override
-    public void deleteCategory(Long id) {
-        categoryRepository.deleteById(id);
+    @Transactional
+    public Category updateCategory(String token, Long id, Category updatedCategory) {
+        User user = getAuthenticatedUser(token);
+        Category category = categoryRepository.findByCategoryIdAndUser(id, user)
+                .orElseThrow(() -> new NotFoundException("Category with ID " + id + " not found"));
+
+        if (!category.getUser().getUserId().equals(user.getUserId())) {
+            throw new ForbiddenException("You do not have permission to modify this category");
+        }
+
+        category.setName(updatedCategory.getName());
+        category.setParentCategory(updatedCategory.getParentCategory());
+
+        return categoryRepository.save(category);
     }
 
-    private CategoryDTO mapToDto(Category category) {
-        CategoryDTO dto = new CategoryDTO();
-        dto.setId(category.getCategoryId());
-        dto.setName(category.getName());
-        return dto;
-    }
+    @Override
+    @Transactional
+    public void deleteCategory(String token, Long id) {
+        User user = getAuthenticatedUser(token);
+        Category category = categoryRepository.findByCategoryIdAndUser(id, user)
+                .orElseThrow(() -> new NotFoundException("Category with ID " + id + " not found"));
 
-    private Category mapToEntity(CategoryDTO dto) {
-        Category category = new Category();
-        category.setName(dto.getName());
-        return category;
+        if (!category.getUser().getUserId().equals(user.getUserId())) {
+            throw new ForbiddenException("You do not have permission to delete this category");
+        }
+
+        categoryRepository.delete(category);
     }
 }
