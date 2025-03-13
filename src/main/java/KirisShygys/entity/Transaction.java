@@ -39,9 +39,6 @@ public class Transaction {
     @Column(name = "datetime", nullable = false)
     private LocalDateTime datetime;
 
-
-
-
     @Column(name = "place")
     private String place;
 

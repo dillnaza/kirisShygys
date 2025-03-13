@@ -43,17 +43,13 @@ public class CategoryServiceImpl extends TransactionEntityService<Category, Long
     public Category createCategory(String token, Category category) {
         User user = getAuthenticatedUser(token);
         category.setUser(user);
-
-        // Проверка, что родительская категория принадлежит пользователю
         if (category.getParentCategory() != null) {
             Category parentCategory = categoryRepository.findById(category.getParentCategory().getId())
                     .orElseThrow(() -> new NotFoundException("Parent category not found"));
-
             if (!parentCategory.getUser().equals(user)) {
                 throw new UnauthorizedException("Parent category does not belong to the user");
             }
         }
-
         return categoryRepository.save(category);
     }
 
@@ -63,22 +59,17 @@ public class CategoryServiceImpl extends TransactionEntityService<Category, Long
         User user = getAuthenticatedUser(token);
         Category existingCategory = categoryRepository.findByIdAndUser(id, user)
                 .orElseThrow(() -> new NotFoundException("Category with ID " + id + " not found"));
-
         existingCategory.setName(updatedCategory.getName());
-
         if (updatedCategory.getParentCategory() != null) {
             Category parentCategory = categoryRepository.findById(updatedCategory.getParentCategory().getId())
                     .orElseThrow(() -> new NotFoundException("Parent category not found"));
-
             if (!parentCategory.getUser().equals(user)) {
                 throw new UnauthorizedException("Parent category does not belong to the user");
             }
-
             existingCategory.setParentCategory(parentCategory);
         } else {
             existingCategory.setParentCategory(null);
         }
-
         return categoryRepository.save(existingCategory);
     }
 
@@ -87,8 +78,6 @@ public class CategoryServiceImpl extends TransactionEntityService<Category, Long
         User user = getAuthenticatedUser(token);
         Category category = categoryRepository.findByIdAndUser(categoryId, user)
                 .orElseThrow(() -> new NotFoundException("Category not found"));
-
-        // Удаление всех подкатегорий
         categoryRepository.deleteByParentCategory(category);
         categoryRepository.delete(category);
     }

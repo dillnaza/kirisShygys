@@ -51,16 +51,13 @@ public class AuthServiceImpl implements AuthService {
         if (userService.findByEmail(user.getEmail()).isPresent()) {
             throw new IllegalArgumentException("Email is already in use");
         }
-
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         User savedUser = userService.saveUser(user);
-
         String token = UUID.randomUUID().toString();
         ConfirmationToken confirmationToken = new ConfirmationToken(
                 token, LocalDateTime.now(), LocalDateTime.now().plusMinutes(15), savedUser
         );
         confirmationTokenService.saveConfirmationToken(confirmationToken);
-
         String confirmLink = "http://localhost:8080/api/auth/confirm?token=" + token;
         String link = "kirisShygys://confirm?token=" + token;
         String htmlContent = "<div style=\"font-family: Arial, sans-serif; max-width: 600px; padding: 20px; border: 1px solid #ddd; border-radius: 8px;\">" +
@@ -78,9 +75,7 @@ public class AuthServiceImpl implements AuthService {
                 "<hr style=\"border: none; border-top: 1px solid #ddd;\">" +
                 "<p style=\"font-size: 12px; color: #888;\">This is an automated email, please do not reply.</p>" +
                 "</div>";
-
         emailService.sendHtmlEmail(user.getEmail(), "Confirm Your Email", htmlContent);
-
         return savedUser;
     }
 
@@ -91,7 +86,6 @@ public class AuthServiceImpl implements AuthService {
         user.setEnabled(true);
         userService.saveUser(user);
         confirmationTokenService.deleteToken(confirmationToken);
-
         return "Email confirmed successfully.";
     }
 
@@ -99,15 +93,12 @@ public class AuthServiceImpl implements AuthService {
     public Map<String, String> login(Map<String, String> loginRequest) {
         String email = loginRequest.get("email");
         String password = loginRequest.get("password");
-
         if (email == null || password == null) {
             throw new IllegalArgumentException("Email and password must be provided");
         }
-
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(email, password)
         );
-
         String accessToken = jwtUtil.generateToken(email, 60);  // Access token на 60 минут
         String refreshToken = jwtUtil.generateToken(email, 1440); // Refresh token на 24 часа
         return Map.of(
@@ -123,15 +114,12 @@ public class AuthServiceImpl implements AuthService {
         if (email == null) {
             throw new IllegalArgumentException("Email must be provided");
         }
-
         Optional<User> userOptional = userService.findByEmail(email);
         if (userOptional.isEmpty()) {
             throw new IllegalArgumentException("User with this email does not exist");
         }
-
         User user = userOptional.get();
         PasswordResetToken token = resetService.createResetToken(user);
-
         String resetLink = "http://localhost:8080/api/auth/reset-password/confirm?token=" + token.getToken();
         String link = "kirisShygys://reset-password?token=" + token.getToken();
         String htmlContent = "<div style=\"font-family: Arial, sans-serif; max-width: 600px; padding: 20px; border: 1px solid #ddd; border-radius: 8px;\">" +
@@ -157,12 +145,10 @@ public class AuthServiceImpl implements AuthService {
         try {
             PasswordResetToken resetToken = resetService.validateResetToken(token);
             User user = resetToken.getUser();
-
             String newPassword = request.get("newPassword");
             if (newPassword == null || newPassword.length() < 6) {
                 throw new IllegalArgumentException("New password must be at least 6 characters long");
             }
-
             user.setPassword(passwordEncoder.encode(newPassword));
             userService.saveUser(user);
             resetService.deleteResetToken(resetToken);
@@ -174,11 +160,9 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public String refreshToken(Map<String, String> request) {
         String refreshToken = request.get("refreshToken");
-
         if (refreshToken == null || !jwtUtil.validateToken(refreshToken)) {
             throw new IllegalArgumentException("Invalid refresh token");
         }
-
         String email = jwtUtil.extractUsername(refreshToken);
         return jwtUtil.generateToken(email, 60);
     }

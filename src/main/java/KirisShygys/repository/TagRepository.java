@@ -13,8 +13,6 @@ import java.util.Optional;
 @Repository
 public interface TagRepository extends JpaRepository<Tag, Long> {
 
-    @Query("SELECT t FROM Tag t WHERE t.user = :user")
     List<Tag> findByUser(@Param("user") User user);
-
     Optional<Tag> findByIdAndUser(Long id, User user);
 }

@@ -2,7 +2,6 @@ package KirisShygys.entity;
 
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
-import java.util.UUID;
 
 @Entity
 public class ConfirmationToken {
@@ -24,7 +23,7 @@ public class ConfirmationToken {
         this.token = token;
         this.user = user;
         this.createdAt = LocalDateTime.now();
-        this.expiresAt = LocalDateTime.now().plusMinutes(15); // Token expires in 15 minutes
+        this.expiresAt = LocalDateTime.now().plusMinutes(15);
     }
 
     public ConfirmationToken(String token, LocalDateTime createdAt, LocalDateTime expiresAt, User user) {
