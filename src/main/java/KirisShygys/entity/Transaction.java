@@ -13,7 +13,7 @@ public class Transaction {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "transaction_id")
-    private Long transactionId;
+    private Long id;
 
     @ManyToOne
     @JoinColumn(name = "category_id", nullable = false)
@@ -57,12 +57,12 @@ public class Transaction {
         INCOME, EXPENSE
     }
 
-    public Long getTransactionId() {
-        return transactionId;
+    public Long getId() {
+        return id;
     }
 
-    public void setTransactionId(Long transactionId) {
-        this.transactionId = transactionId;
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public Category getCategory() {

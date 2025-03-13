@@ -11,7 +11,7 @@ public class Account {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "account_id")
-    private Long accountId;
+    private Long id;
 
     @NotBlank(message = "Account name cannot be empty")
     @Column(name = "name", nullable = false)
@@ -22,12 +22,12 @@ public class Account {
     @JsonIgnore
     private User user;
 
-    public Long getAccountId() {
-        return accountId;
+    public Long getId() {
+        return id;
     }
 
-    public void setAccountId(Long accountId) {
-        this.accountId = accountId;
+    public void setId(Long accountId) {
+        this.id = id;
     }
 
     public String getName() {

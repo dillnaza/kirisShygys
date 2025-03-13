@@ -11,7 +11,7 @@ public class Tag {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "tag_id")
-    private Long tagId;
+    private Long id;
 
     @NotBlank(message = "Tag name cannot be empty")
     @Column(name = "name", nullable = false)
@@ -22,11 +22,11 @@ public class Tag {
     @JsonIgnore
     private User user;
 
-    public Long getTagId() {
-        return tagId;
+    public Long getId() {
+        return id;
     }
-    public void setTagId(Long tagId) {
-        this.tagId = tagId;
+    public void setId(Long id) {
+        this.id = id;
     }
     public String getName() {
         return name;

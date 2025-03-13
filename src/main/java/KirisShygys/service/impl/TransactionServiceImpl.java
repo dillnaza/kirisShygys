@@ -46,7 +46,7 @@ public class TransactionServiceImpl implements TransactionService {
 
     private TransactionDTO mapToDto(Transaction transaction) {
         TransactionDTO dto = new TransactionDTO();
-        dto.setId(transaction.getTransactionId());
+        dto.setId(transaction.getId());
         dto.setType(transaction.getType());
         dto.setDatetime(transaction.getDatetime().toString());
         return dto;
