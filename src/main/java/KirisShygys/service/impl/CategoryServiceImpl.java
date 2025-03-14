@@ -1,5 +1,6 @@
 package KirisShygys.service.impl;
 
+import KirisShygys.dto.CategoryRequest;
 import KirisShygys.entity.Category;
 import KirisShygys.entity.User;
 import KirisShygys.exception.NotFoundException;
@@ -29,7 +30,10 @@ public class CategoryServiceImpl extends TransactionEntityService<Category, Long
     @Override
     public List<Category> getCategories(String token) {
         User user = getAuthenticatedUser(token);
-        return categoryRepository.findByUser(user);
+        List<Category> categories = categoryRepository.findByUser(user);
+        return categories.stream()
+                .filter(category -> category.getParentCategory() == null)
+                .toList();
     }
 
     @Override
@@ -40,15 +44,21 @@ public class CategoryServiceImpl extends TransactionEntityService<Category, Long
     }
 
     @Transactional
-    public Category createCategory(String token, Category category) {
+    public Category createCategory(String token, CategoryRequest request) {
         User user = getAuthenticatedUser(token);
+        Category category = new Category();
+        category.setName(request.getName());
         category.setUser(user);
-        if (category.getParentCategory() != null) {
-            Category parentCategory = categoryRepository.findById(category.getParentCategory().getId())
+        if (request.getParentCategoryId() != null) {
+            Category parentCategory = categoryRepository.findById(request.getParentCategoryId())
                     .orElseThrow(() -> new NotFoundException("Parent category not found"));
             if (!parentCategory.getUser().equals(user)) {
                 throw new UnauthorizedException("Parent category does not belong to the user");
             }
+            if (parentCategory.getParentCategory() != null) {
+                throw new IllegalArgumentException("Nested subcategories (grandchildren) are not allowed.");
+            }
+            category.setParentCategory(parentCategory);
         }
         return categoryRepository.save(category);
     }
@@ -65,6 +75,9 @@ public class CategoryServiceImpl extends TransactionEntityService<Category, Long
                     .orElseThrow(() -> new NotFoundException("Parent category not found"));
             if (!parentCategory.getUser().equals(user)) {
                 throw new UnauthorizedException("Parent category does not belong to the user");
+            }
+            if (parentCategory.getParentCategory() != null) {
+                throw new IllegalArgumentException("Nested subcategories (grandchildren) are not allowed.");
             }
             existingCategory.setParentCategory(parentCategory);
         } else {

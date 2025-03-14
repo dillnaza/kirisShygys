@@ -1,5 +1,6 @@
 package KirisShygys.controller;
 
+import KirisShygys.dto.CategoryRequest;
 import KirisShygys.entity.Category;
 import KirisShygys.service.CategoryService;
 import org.springframework.http.ResponseEntity;
@@ -28,8 +29,9 @@ public class CategoryController {
     }
 
     @PostMapping
-    public ResponseEntity<Category> createCategory(@RequestHeader("Authorization") String token, @RequestBody Category category) {
-        return ResponseEntity.ok(categoryService.createCategory(token.replace("Bearer ", ""), category));
+    public ResponseEntity<Category> createCategory(@RequestHeader("Authorization") String token,
+                                                   @RequestBody CategoryRequest request) {
+        return ResponseEntity.ok(categoryService.createCategory(token.replace("Bearer ", ""), request));
     }
 
     @PutMapping("/{id}")
