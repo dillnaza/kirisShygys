@@ -20,17 +20,17 @@ public abstract class BaseService {
     }
 
     protected User getAuthenticatedUser(String token) {
-        if (token == null || token.isEmpty()) {
+        if (token == null || token.isBlank()) {
             throw new UnauthorizedException("Missing authentication token");
         }
         String email;
         try {
             email = jwtUtil.extractUsername(token);
         } catch (Exception e) {
-            logger.warn("Invalid token provided: {}", token);
-            throw new InvalidTokenException("Invalid authentication token");
+            logger.warn("Invalid authentication token");
+            throw new UnauthorizedException("Invalid authentication token");
         }
         return userRepository.findByEmail(email)
-                .orElseThrow(() -> new UnauthorizedException("Invalid or expired token"));
+                .orElseThrow(() -> new UnauthorizedException("Invalid or expired authentication token"));
     }
 }

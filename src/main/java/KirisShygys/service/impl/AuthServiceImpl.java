@@ -3,6 +3,7 @@ package KirisShygys.service.impl;
 import KirisShygys.entity.ConfirmationToken;
 import KirisShygys.entity.PasswordResetToken;
 import KirisShygys.entity.User;
+import KirisShygys.exception.ForbiddenException;
 import KirisShygys.exception.InvalidTokenException;
 import KirisShygys.exception.TokenExpiredException;
 import KirisShygys.service.*;
@@ -93,14 +94,17 @@ public class AuthServiceImpl implements AuthService {
     public Map<String, String> login(Map<String, String> loginRequest) {
         String email = loginRequest.get("email");
         String password = loginRequest.get("password");
-        if (email == null || password == null) {
-            throw new IllegalArgumentException("Email and password must be provided");
+        User user = userService.findByEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("Invalid email or password"));
+
+        if (!user.isEnabled()) {
+            throw new ForbiddenException("Account is not activated");
         }
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(email, password)
         );
-        String accessToken = jwtUtil.generateToken(email, 60);  // Access token на 60 минут
-        String refreshToken = jwtUtil.generateToken(email, 1440); // Refresh token на 24 часа
+        String accessToken = jwtUtil.generateToken(email, 60);
+        String refreshToken = jwtUtil.generateToken(email, 1440);
         return Map.of(
                 "accessToken", accessToken,
                 "refreshToken", refreshToken

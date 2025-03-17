@@ -2,6 +2,7 @@ package KirisShygys.service.impl;
 
 import KirisShygys.entity.User;
 import KirisShygys.exception.NotFoundException;
+import KirisShygys.exception.UnauthorizedException;
 import KirisShygys.repository.UserRepository;
 import KirisShygys.util.JwtUtil;
 import org.slf4j.Logger;
@@ -23,12 +24,18 @@ public abstract class TransactionEntityService<T, ID> extends BaseService {
     }
 
     public List<T> getAll(String token) {
+        if (token == null || token.isBlank()) {
+            throw new UnauthorizedException("Invalid or missing token");
+        }
         getAuthenticatedUser(token);
         logger.info("Fetching all {}", entityName);
         return repository.findAll();
     }
 
     public T getById(String token, ID id) {
+        if (token == null || token.isBlank()) {
+            throw new UnauthorizedException("Invalid or missing token");
+        }
         getAuthenticatedUser(token);
         logger.info("Fetching {} with ID {}", entityName, id);
         return repository.findById(id)
@@ -37,6 +44,9 @@ public abstract class TransactionEntityService<T, ID> extends BaseService {
 
     @Transactional
     public T create(String token, T entity) {
+        if (token == null || token.isBlank()) {
+            throw new UnauthorizedException("Invalid or missing token");
+        }
         getAuthenticatedUser(token);
         logger.info("Creating new {}", entityName);
         return repository.save(entity);
@@ -44,16 +54,19 @@ public abstract class TransactionEntityService<T, ID> extends BaseService {
 
     @Transactional
     public T update(String token, ID id, T updatedEntity) {
-        getAuthenticatedUser(token);
-        if (!repository.existsById(id)) {
-            throw new NotFoundException(entityName + " with ID " + id + " not found");
+        if (token == null || token.isBlank()) {
+            throw new UnauthorizedException("Invalid or missing token");
         }
+        getAuthenticatedUser(token);
         logger.info("Updating {} with ID {}", entityName, id);
         return repository.save(updatedEntity);
     }
 
     @Transactional
     public void delete(String token, ID id) {
+        if (token == null || token.isBlank()) {
+            throw new UnauthorizedException("Invalid or missing token");
+        }
         getAuthenticatedUser(token);
         if (!repository.existsById(id)) {
             throw new NotFoundException(entityName + " with ID " + id + " not found");

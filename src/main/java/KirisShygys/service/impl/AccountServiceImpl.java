@@ -2,6 +2,8 @@ package KirisShygys.service.impl;
 
 import KirisShygys.entity.Account;
 import KirisShygys.entity.User;
+import KirisShygys.exception.NotFoundException;
+import KirisShygys.exception.UnauthorizedException;
 import KirisShygys.repository.AccountRepository;
 import KirisShygys.repository.UserRepository;
 import KirisShygys.service.AccountService;
@@ -25,5 +27,17 @@ public class AccountServiceImpl extends TransactionEntityService<Account, Long> 
         User user = getAuthenticatedUser(token);
         account.setUser(user);
         return super.create(token, account);
+    }
+
+    @Override
+    @Transactional
+    public Account update(String token, Long id, Account updatedAccount) {
+        User user = getAuthenticatedUser(token);
+        Account existingAccount = super.getById(token, id);
+        if (!existingAccount.getUser().equals(user)) {
+            throw new UnauthorizedException("You do not have permission to update this account.");
+        }
+        existingAccount.setName(updatedAccount.getName());
+        return accountRepository.save(existingAccount);
     }
 }

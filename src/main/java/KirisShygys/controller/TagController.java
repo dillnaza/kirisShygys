@@ -1,5 +1,6 @@
 package KirisShygys.controller;
 
+import KirisShygys.entity.Account;
 import KirisShygys.entity.Tag;
 import KirisShygys.service.TagService;
 import org.springframework.http.ResponseEntity;
@@ -20,6 +21,11 @@ public class TagController {
     @GetMapping
     public ResponseEntity<List<Tag>> getTags(@RequestHeader("Authorization") String token) {
         return ResponseEntity.ok(tagService.getAll(token.replace("Bearer ", "")));
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<Tag> getById(@RequestHeader("Authorization") String token, @PathVariable Long id) {
+        return ResponseEntity.ok(tagService.getById(token.replace("Bearer ", ""), id));
     }
 
     @PostMapping

@@ -1,6 +1,7 @@
 package KirisShygys.controller;
 
 import KirisShygys.entity.Account;
+import KirisShygys.entity.Tag;
 import KirisShygys.service.AccountService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -20,6 +21,11 @@ public class AccountController {
     @GetMapping
     public ResponseEntity<List<Account>> getAccounts(@RequestHeader("Authorization") String token) {
         return ResponseEntity.ok(accountService.getAll(token.replace("Bearer ", "")));
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<Account> getById(@RequestHeader("Authorization") String token, @PathVariable Long id) {
+        return ResponseEntity.ok(accountService.getById(token.replace("Bearer ", ""), id));
     }
 
     @PostMapping

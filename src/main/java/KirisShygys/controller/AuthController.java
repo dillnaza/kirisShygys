@@ -19,24 +19,14 @@ public class AuthController {
 
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody User user) {
-        try {
-            User registeredUser = authService.register(user);
-            return ResponseEntity.ok(Map.of(
-                    "message", "Registration successful. Check your email to confirm your account."
-            ));
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
-        }
+        authService.register(user);
+        return ResponseEntity.ok(Map.of("message", "Registration successful. Check your email to confirm your account."));
     }
 
     @GetMapping("/confirm")
     public ResponseEntity<?> confirmEmail(@RequestParam("token") String token) {
-        try {
-            String message = authService.confirmEmail(token);
+        String message = authService.confirmEmail(token);
             return ResponseEntity.ok(Map.of("message", message));
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
-        }
     }
 
     @PostMapping("/login")
@@ -54,7 +44,7 @@ public class AuthController {
     @PostMapping("/reset-password/confirm")
     public ResponseEntity<?> resetPassword(@RequestParam String token, @RequestBody Map<String, String> request) {
         authService.resetPassword(token, request);
-        return ResponseEntity.ok(Map.of("message", "Password successfully reset."));
+        return ResponseEntity.ok(Map.of("message", "Password updated successfully."));
     }
     @PostMapping("/refresh")
     public ResponseEntity<?> refresh(@RequestBody Map<String, String> request) {
