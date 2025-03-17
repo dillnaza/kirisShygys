@@ -11,11 +11,19 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.List;
 
 @WebFilter("/*")
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtUtil jwtUtil;
+    private static final List<String> PUBLIC_ENDPOINTS = List.of(
+            "/api/auth/register",
+            "/api/auth/login",
+            "/api/auth/confirm",
+            "/api/auth/reset-password/request",
+            "/api/auth/reset-password/confirm"
+    );
 
     public JwtAuthenticationFilter(JwtUtil jwtUtil) {
         this.jwtUtil = jwtUtil;
@@ -23,6 +31,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException, ServletException {
+        String requestURI = request.getRequestURI();
+        if (PUBLIC_ENDPOINTS.stream().anyMatch(requestURI::startsWith)) {
+            filterChain.doFilter(request, response);
+            return;
+        }
         String token = getJwtFromRequest(request);
         if (token != null && jwtUtil.validateToken(token)) {
             String username = jwtUtil.extractUsername(token);

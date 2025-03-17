@@ -19,24 +19,14 @@ public class AuthController {
 
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody User user) {
-        try {
-            User registeredUser = authService.register(user);
-            return ResponseEntity.ok(Map.of(
-                    "message", "Registration successful. Check your email to confirm your account."
-            ));
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
-        }
+        authService.register(user);
+        return ResponseEntity.ok(Map.of("message", "Registration successful. Check your email to confirm your account."));
     }
 
     @GetMapping("/confirm")
     public ResponseEntity<?> confirmEmail(@RequestParam("token") String token) {
-        try {
-            String message = authService.confirmEmail(token);
+        String message = authService.confirmEmail(token);
             return ResponseEntity.ok(Map.of("message", message));
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
-        }
     }
 
     @PostMapping("/login")
