@@ -65,13 +65,13 @@ public class CategoryServiceImpl extends TransactionEntityService<Category, Long
 
     @Override
     @Transactional
-    public Category updateCategory(String token, Long id, Category updatedCategory) {
+    public Category updateCategory(String token, Long id, CategoryRequest request) {
         User user = getAuthenticatedUser(token);
         Category existingCategory = categoryRepository.findByIdAndUser(id, user)
                 .orElseThrow(() -> new NotFoundException("Category with ID " + id + " not found"));
-        existingCategory.setName(updatedCategory.getName());
-        if (updatedCategory.getParentCategory() != null) {
-            Category parentCategory = categoryRepository.findById(updatedCategory.getParentCategory().getId())
+        existingCategory.setName(request.getName());
+        if (request.getParentCategoryId() != null) {
+            Category parentCategory = categoryRepository.findById(request.getParentCategoryId())
                     .orElseThrow(() -> new NotFoundException("Parent category not found"));
             if (!parentCategory.getUser().equals(user)) {
                 throw new UnauthorizedException("Parent category does not belong to the user");
@@ -85,6 +85,7 @@ public class CategoryServiceImpl extends TransactionEntityService<Category, Long
         }
         return categoryRepository.save(existingCategory);
     }
+
 
     @Transactional
     public void deleteCategory(String token, Long categoryId) {

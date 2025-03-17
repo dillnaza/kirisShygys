@@ -35,8 +35,8 @@ public class CategoryController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Category> updateCategory(@RequestHeader("Authorization") String token, @PathVariable Long id, @RequestBody Category category) {
-        return ResponseEntity.ok(categoryService.updateCategory(token.replace("Bearer ", ""), id, category));
+    public ResponseEntity<Category> updateCategory(@RequestHeader("Authorization") String token, @PathVariable Long id, @RequestBody CategoryRequest request) {
+        return ResponseEntity.ok(categoryService.updateCategory(token.replace("Bearer ", ""), id, request));
     }
 
     @DeleteMapping("/{id}")
