@@ -3,13 +3,14 @@ package KirisShygys.service;
 import KirisShygys.dto.TransactionDTO;
 import KirisShygys.entity.Transaction;
 import KirisShygys.entity.User;
-
 import java.time.LocalDateTime;
 import java.util.List;
 
 public interface TransactionService {
-    List<Transaction> getUserTransactions(User user, LocalDateTime dateFrom, LocalDateTime dateTo);
-    TransactionDTO createTransaction(TransactionDTO transactionDto);
-    TransactionDTO updateTransaction(Long id, TransactionDTO transactionDto);
-    void deleteTransaction(Long id);
+    List<TransactionDTO> getUserTransactions(String token);
+    TransactionDTO getTransactionById(String token, Long id);
+    TransactionDTO createTransaction(TransactionDTO transactionDto, String token);
+    TransactionDTO updateTransaction(String token, Long id, TransactionDTO transactionDto);
+    void deleteTransaction(String token, Long id);
+
 }

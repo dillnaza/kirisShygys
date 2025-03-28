@@ -39,12 +39,10 @@ public class BalanceController {
         BigDecimal totalBalance = balanceService.getUserTotalBalance(user.get());
         BigDecimal totalIncome = balanceService.getUserIncome(user.get());
         BigDecimal totalExpenses = balanceService.getUserExpenses(user.get());
-        List<Transaction> transactions = transactionService.getUserTransactions(user.get(), LocalDateTime.now().minusMonths(3), LocalDateTime.now());
         Map<String, Object> response = new HashMap<>();
         response.put("balance", totalBalance);
         response.put("income", totalIncome);
         response.put("expenses", totalExpenses);
-        response.put("transactions", transactions);
         return ResponseEntity.ok(response);
     }
 }

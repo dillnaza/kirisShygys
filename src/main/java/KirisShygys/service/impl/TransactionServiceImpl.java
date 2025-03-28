@@ -1,61 +1,107 @@
 package KirisShygys.service.impl;
 
 import KirisShygys.dto.TransactionDTO;
-import KirisShygys.entity.Transaction;
-import KirisShygys.entity.User;
-import KirisShygys.repository.TransactionRepository;
+import KirisShygys.entity.*;
+import KirisShygys.mapper.TransactionMapper;
+import KirisShygys.repository.*;
 import KirisShygys.service.TransactionService;
+import KirisShygys.util.JwtUtil;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
-public class TransactionServiceImpl implements TransactionService {
-
+public class TransactionServiceImpl extends BaseService implements TransactionService {
     private final TransactionRepository transactionRepository;
+    private final AccountRepository accountRepository;
+    private final TagRepository tagRepository;
+    private final CategoryRepository categoryRepository;
+    private final TransactionMapper transactionMapper;
 
-    public TransactionServiceImpl(TransactionRepository transactionRepository) {
+    public TransactionServiceImpl(TransactionRepository transactionRepository,
+                                  UserRepository userRepository,
+                                  JwtUtil jwtUtil,
+                                  AccountRepository accountRepository,
+                                  TagRepository tagRepository,
+                                  CategoryRepository categoryRepository,
+                                  TransactionMapper transactionMapper) {
+        super(userRepository, jwtUtil);
         this.transactionRepository = transactionRepository;
+        this.accountRepository = accountRepository;
+        this.tagRepository = tagRepository;
+        this.categoryRepository = categoryRepository;
+        this.transactionMapper = transactionMapper;
     }
 
     @Override
-    public List<Transaction> getUserTransactions(User user, LocalDateTime dateFrom, LocalDateTime dateTo) {
-        return transactionRepository.findByUserAndDatetimeBetween(user, dateFrom, dateTo);
+    public List<TransactionDTO> getUserTransactions(String token) {
+        User user = getAuthenticatedUser(token);
+        List<Transaction> transactions = transactionRepository.findByUser(user);
+        System.out.println("Transactions found: " + transactions.size());
+        return transactions.stream()
+                .map(transactionMapper::toDto)
+                .collect(Collectors.toList());
     }
 
     @Override
-    public TransactionDTO createTransaction(TransactionDTO transactionDto) {
-        Transaction transaction = mapToEntity(transactionDto);
-        return mapToDto(transactionRepository.save(transaction));
+    public TransactionDTO getTransactionById(String token, Long id) {
+        User user = getAuthenticatedUser(token);
+        Transaction transaction = transactionRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Transaction not found"));
+        if (!transaction.getUser().getId().equals(user.getId())) {
+            throw new RuntimeException("Access denied");
+        }
+        return transactionMapper.toDto(transaction);
     }
 
     @Override
-    public TransactionDTO updateTransaction(Long id, TransactionDTO transactionDto) {
-        Transaction existingTransaction = transactionRepository.findById(id).orElseThrow(() -> new RuntimeException("Transaction not found"));
-        existingTransaction.setType(transactionDto.getType());
-        existingTransaction.setDatetime(Timestamp.valueOf(transactionDto.getDatetime()).toLocalDateTime());
-        return mapToDto(transactionRepository.save(existingTransaction));
+    @Transactional
+    public TransactionDTO createTransaction(TransactionDTO transactionDto, String token) {
+        User user = getAuthenticatedUser(token);
+        Account account = accountRepository.findById(transactionDto.getAccountId())
+                .orElseThrow(() -> new RuntimeException("Account not found"));
+        Tag tag = (transactionDto.getTagId() != null) ? tagRepository.findById(transactionDto.getTagId()).orElse(null) : null;
+        Category category = categoryRepository.findById(transactionDto.getCategoryId())
+                .orElseThrow(() -> new RuntimeException("Category not found"));
+        Transaction transaction = transactionMapper.toEntity(transactionDto);
+        transaction.setUser(user);
+        transaction.setAccount(account);
+        transaction.setCategory(category);
+        transaction.setTag(tag);
+        transaction = transactionRepository.save(transaction);
+        return transactionMapper.toDto(transaction);
     }
 
     @Override
-    public void deleteTransaction(Long id) {
+    @Transactional
+    public TransactionDTO updateTransaction(String token, Long id, TransactionDTO transactionDto) {
+        User user = getAuthenticatedUser(token);
+        Transaction transaction = transactionRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Transaction not found"));
+        if (!transaction.getUser().getId().equals(user.getId())) {
+            throw new RuntimeException("Access denied");
+        }
+        transaction.setAmount(transactionDto.getAmount());
+        transaction.setDatetime(transactionDto.getDatetime());
+        transaction.setPlace(transactionDto.getPlace());
+        transaction.setNote(transactionDto.getNote());
+        transaction.setType(transactionDto.getType());
+        transaction = transactionRepository.save(transaction);
+        return transactionMapper.toDto(transaction);
+    }
+
+    @Override
+    @Transactional
+    public void deleteTransaction(String token, Long id) {
+        User user = getAuthenticatedUser(token);
+        Transaction transaction = transactionRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Transaction not found"));
+        if (!transaction.getUser().getId().equals(user.getId())) {
+            throw new RuntimeException("Access denied");
+        }
         transactionRepository.deleteById(id);
-    }
-
-    private TransactionDTO mapToDto(Transaction transaction) {
-        TransactionDTO dto = new TransactionDTO();
-        dto.setId(transaction.getId());
-        dto.setType(transaction.getType());
-        dto.setDatetime(transaction.getDatetime().toString());
-        return dto;
-    }
-
-    private Transaction mapToEntity(TransactionDTO dto) {
-        Transaction transaction = new Transaction();
-        transaction.setType(dto.getType());
-        transaction.setDatetime(Timestamp.valueOf(dto.getDatetime()).toLocalDateTime());
-        return transaction;
     }
 }
