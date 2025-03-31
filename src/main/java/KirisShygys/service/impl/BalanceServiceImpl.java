@@ -32,7 +32,6 @@ public class BalanceServiceImpl implements BalanceService {
     public BalanceDTO getUserBalance(String token) {
         String email = jwtUtil.extractUsername(token);
         User user = userRepository.findByEmail(email).orElseThrow(() -> new RuntimeException("User not found"));
-
         List<Transaction> transactions = transactionRepository.findByUser(user);
         return calculateBalance(transactions);
     }
@@ -41,11 +40,9 @@ public class BalanceServiceImpl implements BalanceService {
     public BalanceDTO getUserBalanceByPeriod(String token, LocalDate startDate, LocalDate endDate) {
         String email = jwtUtil.extractUsername(token);
         User user = userRepository.findByEmail(email).orElseThrow(() -> new RuntimeException("User not found"));
-
         List<Transaction> transactions = transactionRepository.findByUserAndDatetimeBetween(
                 user, startDate.atStartOfDay(), endDate.atTime(23, 59, 59)
         );
-
         return calculateBalance(transactions);
     }
 
@@ -54,14 +51,11 @@ public class BalanceServiceImpl implements BalanceService {
                 .filter(t -> t.getType() == Transaction.TransactionType.INCOME)
                 .map(Transaction::getAmount)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
-
         BigDecimal expenses = transactions.stream()
                 .filter(t -> t.getType() == Transaction.TransactionType.EXPENSE)
                 .map(Transaction::getAmount)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
-
         BigDecimal balance = income.subtract(expenses);
-
         List<BalanceTransactionDTO> transactionDTOs = transactions.stream().map(t ->
                 new BalanceTransactionDTO(
                         t.getId(),
@@ -72,7 +66,6 @@ public class BalanceServiceImpl implements BalanceService {
                         t.getTag().getName()
                 )
         ).collect(Collectors.toList());
-
         return new BalanceDTO(income, expenses, balance, transactionDTOs);
     }
 }

@@ -11,7 +11,4 @@ import java.util.Optional;
 
 @Repository
 public interface AccountRepository extends JpaRepository<Account, Long> {
-
-    List<Account> findByUser(@Param("user") User user);
-    Optional<Account> findByIdAndUser(Long id, User user);
 }

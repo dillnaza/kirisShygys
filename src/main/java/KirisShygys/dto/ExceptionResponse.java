@@ -17,7 +17,6 @@ public class ExceptionResponse {
         this.message = message;
     }
 
-    // getters and setters
     public LocalDateTime getTimestamp() {
         return timestamp;
     }

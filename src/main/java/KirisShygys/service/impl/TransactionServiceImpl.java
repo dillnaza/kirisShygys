@@ -56,12 +56,10 @@ public class TransactionServiceImpl extends BaseService implements TransactionSe
                     logger.warn("Transaction with ID {} not found", id);
                     return new NotFoundException("Transaction with ID " + id + " not found");
                 });
-
         if (!transaction.getUser().equals(user)) {
             logger.warn("User {} attempted unauthorized access to transaction ID {}", user.getEmail(), id);
             throw new UnauthorizedException("You do not have permission to access this transaction.");
         }
-
         return transactionMapper.toDto(transaction);
     }
 
@@ -74,13 +72,11 @@ public class TransactionServiceImpl extends BaseService implements TransactionSe
         Category category = categoryRepository.findById(transactionDto.getCategoryId())
                 .orElseThrow(() -> new NotFoundException("Category with ID " + transactionDto.getCategoryId() + " not found"));
         Tag tag = (transactionDto.getTagId() != null) ? tagRepository.findById(transactionDto.getTagId()).orElse(null) : null;
-
         Transaction transaction = transactionMapper.toEntity(transactionDto);
         transaction.setUser(user);
         transaction.setAccount(account);
         transaction.setCategory(category);
         transaction.setTag(tag);
-
         transaction = transactionRepository.save(transaction);
         logger.info("Transaction created with ID: {} for user: {}", transaction.getId(), user.getEmail());
         return transactionMapper.toDto(transaction);
@@ -95,18 +91,15 @@ public class TransactionServiceImpl extends BaseService implements TransactionSe
                     logger.warn("Transaction with ID {} not found", id);
                     return new NotFoundException("Transaction with ID " + id + " not found");
                 });
-
         if (!transaction.getUser().equals(user)) {
             logger.warn("User {} attempted unauthorized update on transaction ID {}", user.getEmail(), id);
             throw new UnauthorizedException("You do not have permission to update this transaction.");
         }
-
         transaction.setAmount(transactionDto.getAmount());
         transaction.setDatetime(transactionDto.getDatetime());
         transaction.setPlace(transactionDto.getPlace());
         transaction.setNote(transactionDto.getNote());
         transaction.setType(transactionDto.getType());
-
         transaction = transactionRepository.save(transaction);
         logger.info("Transaction updated with ID: {} by user: {}", id, user.getEmail());
         return transactionMapper.toDto(transaction);
@@ -121,12 +114,10 @@ public class TransactionServiceImpl extends BaseService implements TransactionSe
                     logger.warn("Transaction with ID {} not found", id);
                     return new NotFoundException("Transaction with ID " + id + " not found");
                 });
-
         if (!transaction.getUser().equals(user)) {
             logger.warn("User {} attempted unauthorized deletion of transaction ID {}", user.getEmail(), id);
             throw new UnauthorizedException("You do not have permission to delete this transaction.");
         }
-
         transactionRepository.deleteById(id);
         logger.info("Transaction deleted with ID: {} by user: {}", id, user.getEmail());
     }
