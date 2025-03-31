@@ -1,9 +1,6 @@
 package KirisShygys.service;
 
 import KirisShygys.dto.TransactionDTO;
-import KirisShygys.entity.Transaction;
-import KirisShygys.entity.User;
-import java.time.LocalDateTime;
 import java.util.List;
 
 public interface TransactionService {

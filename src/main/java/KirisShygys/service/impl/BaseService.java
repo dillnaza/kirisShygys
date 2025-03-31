@@ -1,7 +1,6 @@
 package KirisShygys.service.impl;
 
 import KirisShygys.entity.User;
-import KirisShygys.exception.InvalidTokenException;
 import KirisShygys.exception.UnauthorizedException;
 import KirisShygys.repository.UserRepository;
 import KirisShygys.util.JwtUtil;
@@ -21,16 +20,16 @@ public abstract class BaseService {
 
     protected User getAuthenticatedUser(String token) {
         if (token == null || token.isBlank()) {
+            logger.error("Missing authentication token");
             throw new UnauthorizedException("Missing authentication token");
         }
-        String email;
         try {
-            email = jwtUtil.extractUsername(token);
+            String email = jwtUtil.extractUsername(token);
+            return userRepository.findByEmail(email)
+                    .orElseThrow(() -> new UnauthorizedException("Invalid or expired authentication token"));
         } catch (Exception e) {
-            logger.warn("Invalid authentication token");
+            logger.error("Invalid authentication token", e);
             throw new UnauthorizedException("Invalid authentication token");
         }
-        return userRepository.findByEmail(email)
-                .orElseThrow(() -> new UnauthorizedException("Invalid or expired authentication token"));
     }
 }
