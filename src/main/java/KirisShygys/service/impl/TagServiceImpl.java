@@ -2,7 +2,6 @@ package KirisShygys.service.impl;
 
 import KirisShygys.entity.Tag;
 import KirisShygys.entity.User;
-import KirisShygys.exception.NotFoundException;
 import KirisShygys.exception.UnauthorizedException;
 import KirisShygys.repository.TagRepository;
 import KirisShygys.repository.UserRepository;

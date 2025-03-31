@@ -1,48 +1,31 @@
 package KirisShygys.controller;
 
-import KirisShygys.entity.Transaction;
-import KirisShygys.entity.User;
+import KirisShygys.dto.BalanceDTO;
 import KirisShygys.service.BalanceService;
-import KirisShygys.service.TransactionService;
-import KirisShygys.service.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.math.BigDecimal;
-import java.security.Principal;
-import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.time.LocalDate;
 
 @RestController
 @RequestMapping("/api/balance")
 public class BalanceController {
 
     private final BalanceService balanceService;
-    private final TransactionService transactionService;
-    private final UserService userService;
 
-    public BalanceController(BalanceService balanceService, TransactionService transactionService, UserService userService) {
+    public BalanceController(BalanceService balanceService) {
         this.balanceService = balanceService;
-        this.transactionService = transactionService;
-        this.userService = userService;
     }
 
-    @GetMapping("/dashboard")
-    public ResponseEntity<Map<String, Object>> getUserDashboard(Principal principal) {
-        Optional<User> user = userService.findByEmail(principal.getName());
-        if (user.isEmpty()) {
-            return ResponseEntity.status(404).body(Map.of("error", "User not found"));
-        }
-        BigDecimal totalBalance = balanceService.getUserTotalBalance(user.get());
-        BigDecimal totalIncome = balanceService.getUserIncome(user.get());
-        BigDecimal totalExpenses = balanceService.getUserExpenses(user.get());
-        Map<String, Object> response = new HashMap<>();
-        response.put("balance", totalBalance);
-        response.put("income", totalIncome);
-        response.put("expenses", totalExpenses);
-        return ResponseEntity.ok(response);
+    @GetMapping
+    public ResponseEntity<BalanceDTO> getUserBalance(@RequestHeader("Authorization") String token) {
+        return ResponseEntity.ok(balanceService.getUserBalance(token.replace("Bearer ", "")));
+    }
+
+    @GetMapping("/period")
+    public ResponseEntity<BalanceDTO> getUserBalanceByPeriod(@RequestHeader("Authorization") String token,
+                                                             @RequestParam LocalDate startDate,
+                                                             @RequestParam LocalDate endDate) {
+        return ResponseEntity.ok(balanceService.getUserBalanceByPeriod(token.replace("Bearer ", ""), startDate, endDate));
     }
 }

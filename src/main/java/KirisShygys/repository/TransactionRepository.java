@@ -10,6 +10,7 @@ import java.util.List;
 
 @Repository
 public interface TransactionRepository extends JpaRepository<Transaction, Long> {
-    List<Transaction> findByUserAndDatetimeBetween(User user, LocalDateTime dateFrom, LocalDateTime dateTo);
+
     List<Transaction> findByUser(User user);
+    List<Transaction> findByUserAndDatetimeBetween(User user, LocalDateTime start, LocalDateTime end);
 }

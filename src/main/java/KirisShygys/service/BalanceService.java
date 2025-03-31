@@ -1,11 +1,10 @@
 package KirisShygys.service;
 
-import KirisShygys.entity.User;
+import KirisShygys.dto.BalanceDTO;
 
-import java.math.BigDecimal;
+import java.time.LocalDate;
 
 public interface BalanceService {
-    BigDecimal getUserTotalBalance(User user);
-    BigDecimal getUserIncome(User user);
-    BigDecimal getUserExpenses(User user);
+    BalanceDTO getUserBalance(String token);
+    BalanceDTO getUserBalanceByPeriod(String token, LocalDate startDate, LocalDate endDate);
 }

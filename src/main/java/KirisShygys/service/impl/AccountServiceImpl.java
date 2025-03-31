@@ -2,7 +2,6 @@ package KirisShygys.service.impl;
 
 import KirisShygys.entity.Account;
 import KirisShygys.entity.User;
-import KirisShygys.exception.NotFoundException;
 import KirisShygys.exception.UnauthorizedException;
 import KirisShygys.repository.AccountRepository;
 import KirisShygys.repository.UserRepository;
