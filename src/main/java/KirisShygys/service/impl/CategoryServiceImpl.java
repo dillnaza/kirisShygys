@@ -9,8 +9,6 @@ import KirisShygys.repository.CategoryRepository;
 import KirisShygys.repository.UserRepository;
 import KirisShygys.service.CategoryService;
 import KirisShygys.util.JwtUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,7 +17,6 @@ import java.util.List;
 @Service
 public class CategoryServiceImpl extends TransactionEntityService<Category, Long> implements CategoryService {
 
-    private static final Logger logger = LoggerFactory.getLogger(CategoryServiceImpl.class);
     private final CategoryRepository categoryRepository;
 
     public CategoryServiceImpl(CategoryRepository categoryRepository, UserRepository userRepository, JwtUtil jwtUtil) {

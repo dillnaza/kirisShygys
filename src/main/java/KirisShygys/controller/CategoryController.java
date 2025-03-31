@@ -6,6 +6,7 @@ import KirisShygys.service.CategoryService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import jakarta.servlet.http.HttpServletRequest;
 import java.util.List;
 
 @RestController
@@ -18,30 +19,38 @@ public class CategoryController {
         this.categoryService = categoryService;
     }
 
+    private String getAuthToken(HttpServletRequest request) {
+        return (String) request.getAttribute("AuthToken");
+    }
+
     @GetMapping
-    public ResponseEntity<List<Category>> getCategories(@RequestHeader("Authorization") String token) {
-        return ResponseEntity.ok(categoryService.getCategories(token.replace("Bearer ", "")));
+    public ResponseEntity<List<Category>> getCategories(HttpServletRequest request) {
+        return ResponseEntity.ok(categoryService.getCategories(getAuthToken(request)));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Category> getCategoryById(@RequestHeader("Authorization") String token, @PathVariable Long id) {
-        return ResponseEntity.ok(categoryService.getCategoryById(token.replace("Bearer ", ""), id));
+    public ResponseEntity<Category> getCategoryById(HttpServletRequest request,
+                                                    @PathVariable Long id) {
+        return ResponseEntity.ok(categoryService.getCategoryById(getAuthToken(request), id));
     }
 
     @PostMapping
-    public ResponseEntity<Category> createCategory(@RequestHeader("Authorization") String token,
-                                                   @RequestBody CategoryRequest request) {
-        return ResponseEntity.ok(categoryService.createCategory(token.replace("Bearer ", ""), request));
+    public ResponseEntity<Category> createCategory(HttpServletRequest request,
+                                                   @RequestBody CategoryRequest categoryRequest) {
+        return ResponseEntity.ok(categoryService.createCategory(getAuthToken(request), categoryRequest));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Category> updateCategory(@RequestHeader("Authorization") String token, @PathVariable Long id, @RequestBody CategoryRequest request) {
-        return ResponseEntity.ok(categoryService.updateCategory(token.replace("Bearer ", ""), id, request));
+    public ResponseEntity<Category> updateCategory(HttpServletRequest request,
+                                                   @PathVariable Long id,
+                                                   @RequestBody CategoryRequest categoryRequest) {
+        return ResponseEntity.ok(categoryService.updateCategory(getAuthToken(request), id, categoryRequest));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteCategory(@RequestHeader("Authorization") String token, @PathVariable Long id) {
-        categoryService.deleteCategory(token.replace("Bearer ", ""), id);
+    public ResponseEntity<Void> deleteCategory(HttpServletRequest request,
+                                               @PathVariable Long id) {
+        categoryService.deleteCategory(getAuthToken(request), id);
         return ResponseEntity.noContent().build();
     }
 }
