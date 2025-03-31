@@ -1,11 +1,8 @@
 package KirisShygys.util;
 
-import KirisShygys.entity.User;
-import KirisShygys.repository.UserRepository;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
-import org.springframework.security.core.userdetails.MapReactiveUserDetailsService;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
