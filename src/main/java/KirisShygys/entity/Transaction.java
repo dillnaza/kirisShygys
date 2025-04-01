@@ -1,5 +1,6 @@
 package KirisShygys.entity;
 
+import KirisShygys.entity.enums.TransactionType;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 
@@ -50,9 +51,8 @@ public class Transaction {
     @Column(name = "type", nullable = false)
     private TransactionType type;
 
-    public enum TransactionType {
-        INCOME, EXPENSE
-    }
+    @Column(name = "is_periodic")
+    private boolean isPeriodic;
 
     public Long getId() {
         return id;
@@ -132,5 +132,13 @@ public class Transaction {
 
     public void setUser(User user) {
         this.user = user;
+    }
+
+    public Boolean getIsPeriodic() {
+        return isPeriodic;
+    }
+
+    public void setUser(Boolean isPeriodic) {
+        this.isPeriodic = isPeriodic;
     }
 }

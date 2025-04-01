@@ -4,6 +4,7 @@ import KirisShygys.dto.BalanceDTO;
 import KirisShygys.dto.BalanceTransactionDTO;
 import KirisShygys.entity.Transaction;
 import KirisShygys.entity.User;
+import KirisShygys.entity.enums.TransactionType;
 import KirisShygys.repository.TransactionRepository;
 import KirisShygys.repository.UserRepository;
 import KirisShygys.service.BalanceService;
@@ -48,11 +49,11 @@ public class BalanceServiceImpl implements BalanceService {
 
     private BalanceDTO calculateBalance(List<Transaction> transactions) {
         BigDecimal income = transactions.stream()
-                .filter(t -> t.getType() == Transaction.TransactionType.INCOME)
+                .filter(t -> t.getType() == TransactionType.INCOME)
                 .map(Transaction::getAmount)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
         BigDecimal expenses = transactions.stream()
-                .filter(t -> t.getType() == Transaction.TransactionType.EXPENSE)
+                .filter(t -> t.getType() == TransactionType.EXPENSE)
                 .map(Transaction::getAmount)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
         BigDecimal balance = income.subtract(expenses);

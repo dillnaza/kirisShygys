@@ -1,6 +1,6 @@
 package KirisShygys.dto;
 
-import KirisShygys.entity.Transaction.TransactionType;
+import KirisShygys.entity.enums.TransactionType;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
 import java.math.BigDecimal;
