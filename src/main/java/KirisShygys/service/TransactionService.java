@@ -9,5 +9,4 @@ public interface TransactionService {
     TransactionDTO createTransaction(TransactionDTO transactionDto, String token);
     TransactionDTO updateTransaction(String token, Long id, TransactionDTO transactionDto);
     void deleteTransaction(String token, Long id);
-
 }
