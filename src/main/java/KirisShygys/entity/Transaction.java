@@ -51,9 +51,6 @@ public class Transaction {
     @Column(name = "type", nullable = false)
     private TransactionType type;
 
-    @Column(name = "is_periodic")
-    private boolean isPeriodic;
-
     public Long getId() {
         return id;
     }
@@ -132,13 +129,5 @@ public class Transaction {
 
     public void setUser(User user) {
         this.user = user;
-    }
-
-    public Boolean getIsPeriodic() {
-        return isPeriodic;
-    }
-
-    public void setUser(Boolean isPeriodic) {
-        this.isPeriodic = isPeriodic;
     }
 }
