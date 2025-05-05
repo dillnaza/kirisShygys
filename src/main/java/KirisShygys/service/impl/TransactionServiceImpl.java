@@ -67,11 +67,16 @@ public class TransactionServiceImpl extends BaseService implements TransactionSe
     @Transactional
     public TransactionDTO createTransaction(TransactionDTO transactionDto, String token) {
         User user = getAuthenticatedUser(token);
-        Account account = accountRepository.findById(transactionDto.getAccountId())
-                .orElseThrow(() -> new NotFoundException("Account with ID " + transactionDto.getAccountId() + " not found"));
-        Category category = categoryRepository.findById(transactionDto.getCategoryId())
-                .orElseThrow(() -> new NotFoundException("Category with ID " + transactionDto.getCategoryId() + " not found"));
-        Tag tag = (transactionDto.getTagId() != null) ? tagRepository.findById(transactionDto.getTagId()).orElse(null) : null;
+        Account account = accountRepository.findById(transactionDto.getAccount().getId())
+                .orElseThrow(() -> new NotFoundException("Account with ID " + transactionDto.getAccount().getId() + " not found"));
+
+        Category category = categoryRepository.findById(transactionDto.getCategory().getId())
+                .orElseThrow(() -> new NotFoundException("Category with ID " + transactionDto.getCategory().getId() + " not found"));
+
+        Tag tag = (transactionDto.getTag() != null)
+                ? tagRepository.findById(transactionDto.getTag().getId())
+                .orElseThrow(() -> new NotFoundException("Tag with ID " + transactionDto.getTag().getId() + " not found"))
+                : null;
         Transaction transaction = transactionMapper.toEntity(transactionDto);
         transaction.setUser(user);
         transaction.setAccount(account);
@@ -95,6 +100,16 @@ public class TransactionServiceImpl extends BaseService implements TransactionSe
             logger.warn("User {} attempted unauthorized update on transaction ID {}", user.getEmail(), id);
             throw new UnauthorizedException("You do not have permission to update this transaction.");
         }
+        Account account = accountRepository.findById(transactionDto.getAccount().getId())
+                .orElseThrow(() -> new NotFoundException("Account with ID " + transactionDto.getAccount().getId() + " not found"));
+
+        Category category = categoryRepository.findById(transactionDto.getCategory().getId())
+                .orElseThrow(() -> new NotFoundException("Category with ID " + transactionDto.getCategory().getId() + " not found"));
+
+        Tag tag = (transactionDto.getTag() != null)
+                ? tagRepository.findById(transactionDto.getTag().getId())
+                .orElseThrow(() -> new NotFoundException("Tag with ID " + transactionDto.getTag().getId() + " not found"))
+                : null;
         transaction.setAmount(transactionDto.getAmount());
         transaction.setDatetime(transactionDto.getDatetime());
         transaction.setPlace(transactionDto.getPlace());

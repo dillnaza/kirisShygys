@@ -8,9 +8,9 @@ import java.time.LocalDateTime;
 
 public class TransactionDTO {
     private Long id;
-    private Long categoryId;
-    private Long accountId;
-    private Long tagId;
+    private CategoryDTO category;
+    private AccountDTO account;
+    private TagDTO tag;
     private Long userId;
     private BigDecimal amount;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
@@ -27,28 +27,28 @@ public class TransactionDTO {
         this.id = id;
     }
 
-    public Long getCategoryId() {
-        return categoryId;
+    public CategoryDTO getCategory() {
+        return category;
     }
 
-    public void setCategoryId(Long categoryId) {
-        this.categoryId = categoryId;
+    public void setCategory(CategoryDTO category) {
+        this.category = category;
     }
 
-    public Long getAccountId() {
-        return accountId;
+    public AccountDTO getAccount() {
+        return account;
     }
 
-    public void setAccountId(Long accountId) {
-        this.accountId = accountId;
+    public void setAccount(AccountDTO account) {
+        this.account = account;
     }
 
-    public Long getTagId() {
-        return tagId;
+    public TagDTO getTag() {
+        return tag;
     }
 
-    public void setTagId(Long tagId) {
-        this.tagId = tagId;
+    public void setTag(TagDTO tag) {
+        this.tag = tag;
     }
 
     public Long getUserId() {

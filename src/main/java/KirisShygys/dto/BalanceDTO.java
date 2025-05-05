@@ -7,9 +7,12 @@ public class BalanceDTO {
     private BigDecimal income;
     private BigDecimal expenses;
     private BigDecimal balance;
-    private List<BalanceTransactionDTO> transactions;
+    private List<TransactionDTO> transactions;
 
-    public BalanceDTO(BigDecimal income, BigDecimal expenses, BigDecimal balance, List<BalanceTransactionDTO> transactions) {
+    public BalanceDTO() {
+    }
+
+    public BalanceDTO(BigDecimal income, BigDecimal expenses, BigDecimal balance, List<TransactionDTO> transactions) {
         this.income = income;
         this.expenses = expenses;
         this.balance = balance;
@@ -40,11 +43,11 @@ public class BalanceDTO {
         this.balance = balance;
     }
 
-    public List<BalanceTransactionDTO> getTransactions() {
+    public List<TransactionDTO> getTransactions() {
         return transactions;
     }
 
-    public void setTransactions(List<BalanceTransactionDTO> transactions) {
+    public void setTransactions(List<TransactionDTO> transactions) {
         this.transactions = transactions;
     }
 }

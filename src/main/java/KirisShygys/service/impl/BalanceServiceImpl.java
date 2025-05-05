@@ -1,10 +1,10 @@
 package KirisShygys.service.impl;
 
-import KirisShygys.dto.BalanceDTO;
-import KirisShygys.dto.BalanceTransactionDTO;
+import KirisShygys.dto.*;
 import KirisShygys.entity.Transaction;
 import KirisShygys.entity.User;
 import KirisShygys.entity.enums.TransactionType;
+import KirisShygys.mapper.TransactionMapper;
 import KirisShygys.repository.TransactionRepository;
 import KirisShygys.repository.UserRepository;
 import KirisShygys.service.BalanceService;
@@ -22,11 +22,13 @@ public class BalanceServiceImpl implements BalanceService {
     private final TransactionRepository transactionRepository;
     private final UserRepository userRepository;
     private final JwtUtil jwtUtil;
+    private final TransactionMapper transactionMapper;
 
-    public BalanceServiceImpl(TransactionRepository transactionRepository, UserRepository userRepository, JwtUtil jwtUtil) {
+    public BalanceServiceImpl(TransactionRepository transactionRepository, UserRepository userRepository, JwtUtil jwtUtil, TransactionMapper transactionMapper) {
         this.transactionRepository = transactionRepository;
         this.userRepository = userRepository;
         this.jwtUtil = jwtUtil;
+        this.transactionMapper = transactionMapper;
     }
 
     @Override
@@ -57,16 +59,9 @@ public class BalanceServiceImpl implements BalanceService {
                 .map(Transaction::getAmount)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
         BigDecimal balance = income.subtract(expenses);
-        List<BalanceTransactionDTO> transactionDTOs = transactions.stream().map(t ->
-                new BalanceTransactionDTO(
-                        t.getId(),
-                        t.getAmount(),
-                        t.getType(),
-                        t.getAccount().getName(),
-                        t.getCategory().getName(),
-                        t.getTag().getName()
-                )
-        ).collect(Collectors.toList());
+        List<TransactionDTO> transactionDTOs = transactions.stream()
+                .map(transactionMapper::toDto)
+                .collect(Collectors.toList());
         return new BalanceDTO(income, expenses, balance, transactionDTOs);
     }
 }

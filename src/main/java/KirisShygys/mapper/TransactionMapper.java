@@ -1,5 +1,8 @@
 package KirisShygys.mapper;
 
+import KirisShygys.dto.AccountDTO;
+import KirisShygys.dto.CategoryDTO;
+import KirisShygys.dto.TagDTO;
 import KirisShygys.dto.TransactionDTO;
 import KirisShygys.entity.Transaction;
 import org.springframework.stereotype.Component;
@@ -9,9 +12,15 @@ public class TransactionMapper {
     public TransactionDTO toDto(Transaction transaction) {
         TransactionDTO dto = new TransactionDTO();
         dto.setId(transaction.getId());
-        dto.setCategoryId(transaction.getCategory() != null ? transaction.getCategory().getId() : null);
-        dto.setAccountId(transaction.getAccount() != null ? transaction.getAccount().getId() : null);
-        dto.setTagId(transaction.getTag() != null ? transaction.getTag().getId() : null);
+        dto.setCategory(transaction.getCategory() != null
+                ? new CategoryDTO(transaction.getCategory().getId(), transaction.getCategory().getName())
+                : null);
+        dto.setAccount(transaction.getAccount() != null
+                ? new AccountDTO(transaction.getAccount().getId(), transaction.getAccount().getName())
+                : null);
+        dto.setTag(transaction.getTag() != null
+                ? new TagDTO(transaction.getTag().getId(), transaction.getTag().getName())
+                : null);
         dto.setAmount(transaction.getAmount());
         dto.setDatetime(transaction.getDatetime());
         dto.setPlace(transaction.getPlace());
