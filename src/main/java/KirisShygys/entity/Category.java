@@ -21,6 +21,9 @@ public class Category {
     @Column(name = "name", nullable = false)
     private String name;
 
+    @Column(name = "icon")
+    private String icon;
+
     @ManyToOne
     @JoinColumn(name = "parent_id")
     @JsonBackReference
@@ -49,6 +52,14 @@ public class Category {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getIcon() {
+        return icon;
+    }
+
+    public void setIcon(String icon) {
+        this.icon = icon;
     }
 
     public Category getParentCategory() {

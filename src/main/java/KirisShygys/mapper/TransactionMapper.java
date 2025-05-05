@@ -13,7 +13,7 @@ public class TransactionMapper {
         TransactionDTO dto = new TransactionDTO();
         dto.setId(transaction.getId());
         dto.setCategory(transaction.getCategory() != null
-                ? new CategoryDTO(transaction.getCategory().getId(), transaction.getCategory().getName())
+                ? new CategoryDTO(transaction.getCategory().getId(), transaction.getCategory().getName(), transaction.getCategory().getIcon())
                 : null);
         dto.setAccount(transaction.getAccount() != null
                 ? new AccountDTO(transaction.getAccount().getId(), transaction.getAccount().getName())
