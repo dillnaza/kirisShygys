@@ -1,5 +1,6 @@
 package KirisShygys.entity;
 
+import KirisShygys.entity.enums.TransactionType;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
@@ -24,6 +25,10 @@ public class Category {
     @Column(name = "icon")
     private String icon;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "type", nullable = false)
+    private TransactionType type;
+
     @ManyToOne
     @JoinColumn(name = "parent_id")
     @JsonBackReference
@@ -41,46 +46,42 @@ public class Category {
     public Long getId() {
         return id;
     }
-
     public void setId(Long id) {
         this.id = id;
     }
-
     public String getName() {
         return name;
     }
-
     public void setName(String name) {
         this.name = name;
     }
-
     public String getIcon() {
         return icon;
     }
-
     public void setIcon(String icon) {
         this.icon = icon;
     }
-
+    public TransactionType getType() {
+        return type;
+    }
+    public void setType(TransactionType type) {
+        this.type = type;
+    }
     public Category getParentCategory() {
         return parentCategory;
     }
-
     public void setParentCategory(Category parentCategory) {
         this.parentCategory = parentCategory;
     }
-
     public List<Category> getSubCategories() {
         return subCategories;
     }
-
     public void setSubCategories(List<Category> subCategories) {
         this.subCategories = subCategories;
     }
     public User getUser() {
         return user;
     }
-
     public void setUser(User user) {
         this.user = user;
     }

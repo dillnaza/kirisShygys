@@ -3,6 +3,7 @@ package KirisShygys.service.impl;
 import KirisShygys.dto.CategoryRequest;
 import KirisShygys.entity.Category;
 import KirisShygys.entity.User;
+import KirisShygys.entity.enums.TransactionType;
 import KirisShygys.exception.NotFoundException;
 import KirisShygys.exception.UnauthorizedException;
 import KirisShygys.repository.CategoryRepository;
@@ -92,5 +93,27 @@ public class CategoryServiceImpl extends TransactionEntityService<Category, Long
                 .orElseThrow(() -> new NotFoundException("Category not found"));
         categoryRepository.deleteByParentCategory(category);
         categoryRepository.delete(category);
+    }
+
+    @Override
+    @Transactional
+    public void createDefaultCategories(User user) {
+        List<Category> defaultCategories = List.of(
+                create("Зарплата", "💼", TransactionType.INCOME, user),
+                create("Подарок", "🎁", TransactionType.INCOME, user),
+                create("Еда", "🍔", TransactionType.EXPENSE, user),
+                create("Транспорт", "🚕", TransactionType.EXPENSE, user),
+                create("Развлечения", "🎮", TransactionType.EXPENSE, user)
+        );
+        categoryRepository.saveAll(defaultCategories);
+    }
+
+    private Category create(String name, String icon, TransactionType type, User user) {
+        Category category = new Category();
+        category.setName(name);
+        category.setIcon(icon);
+        category.setType(type);
+        category.setUser(user);
+        return category;
     }
 }

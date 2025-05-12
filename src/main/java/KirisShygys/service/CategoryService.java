@@ -2,6 +2,7 @@ package KirisShygys.service;
 
 import KirisShygys.dto.CategoryRequest;
 import KirisShygys.entity.Category;
+import KirisShygys.entity.User;
 import java.util.List;
 
 public interface CategoryService {
@@ -10,4 +11,5 @@ public interface CategoryService {
     Category createCategory(String token, CategoryRequest request);
     Category updateCategory(String token, Long id, CategoryRequest request);
     void deleteCategory(String token, Long id);
+    void createDefaultCategories(User user);
 }

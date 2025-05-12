@@ -24,6 +24,7 @@ import java.util.UUID;
 public class AuthServiceImpl implements AuthService {
 
     private final UserService userService;
+    private final CategoryService categoryService;
     private final PasswordResetService resetService;
     private final AuthenticationManager authenticationManager;
     private final JwtUtil jwtUtil;
@@ -32,6 +33,7 @@ public class AuthServiceImpl implements AuthService {
     private final PasswordEncoder passwordEncoder;
 
     public AuthServiceImpl(UserService userService,
+                           CategoryService categoryService,
                            PasswordResetService resetService,
                            AuthenticationManager authenticationManager,
                            JwtUtil jwtUtil,
@@ -39,6 +41,7 @@ public class AuthServiceImpl implements AuthService {
                            EmailService emailService,
                            PasswordEncoder passwordEncoder) {
         this.userService = userService;
+        this.categoryService = categoryService;
         this.resetService = resetService;
         this.authenticationManager = authenticationManager;
         this.jwtUtil = jwtUtil;
@@ -54,6 +57,7 @@ public class AuthServiceImpl implements AuthService {
         }
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         User savedUser = userService.saveUser(user);
+        categoryService.createDefaultCategories(savedUser);
         String token = UUID.randomUUID().toString();
         ConfirmationToken confirmationToken = new ConfirmationToken(
                 token, LocalDateTime.now(), LocalDateTime.now().plusMinutes(15), savedUser

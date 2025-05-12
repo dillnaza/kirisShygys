@@ -22,31 +22,24 @@ public class BalanceDTO {
     public BigDecimal getIncome() {
         return income;
     }
-
     public void setIncome(BigDecimal income) {
         this.income = income;
     }
-
     public BigDecimal getExpenses() {
         return expenses;
     }
-
     public void setExpenses(BigDecimal expenses) {
         this.expenses = expenses;
     }
-
     public BigDecimal getBalance() {
         return balance;
     }
-
     public void setBalance(BigDecimal balance) {
         this.balance = balance;
     }
-
     public List<TransactionDTO> getTransactions() {
         return transactions;
     }
-
     public void setTransactions(List<TransactionDTO> transactions) {
         this.transactions = transactions;
     }
