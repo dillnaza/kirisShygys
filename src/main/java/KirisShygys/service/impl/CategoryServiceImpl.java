@@ -13,7 +13,9 @@ import KirisShygys.util.JwtUtil;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class CategoryServiceImpl extends TransactionEntityService<Category, Long> implements CategoryService {
@@ -98,22 +100,51 @@ public class CategoryServiceImpl extends TransactionEntityService<Category, Long
     @Override
     @Transactional
     public void createDefaultCategories(User user) {
-        List<Category> defaultCategories = List.of(
-                create("Зарплата", "💼", TransactionType.INCOME, user),
-                create("Подарок", "🎁", TransactionType.INCOME, user),
-                create("Еда", "🍔", TransactionType.EXPENSE, user),
-                create("Транспорт", "🚕", TransactionType.EXPENSE, user),
-                create("Развлечения", "🎮", TransactionType.EXPENSE, user)
+        Map<String, Category> parentMap = new HashMap<>();
+        List<Category> parents = List.of(
+                create("Государственные выплаты", "🏛️", TransactionType.INCOME, user, null),
+                create("Возвраты", "🔄", TransactionType.INCOME, user, null),
+                create("Транспорт", "🚗", TransactionType.EXPENSE, user, null),
+                create("Финансовые обязательства", "💳", TransactionType.EXPENSE, user, null)
         );
-        categoryRepository.saveAll(defaultCategories);
+        for (Category parent : parents) {
+            categoryRepository.save(parent);
+            parentMap.put(parent.getName(), parent);
+        }
+        List<Category> categories = List.of(
+                create("Зарплата", "💼", TransactionType.INCOME, user, null),
+                create("Стипендия", "🎓", TransactionType.INCOME, user, parentMap.get("Государственные выплаты")),
+                create("Пособие", "📩", TransactionType.INCOME, user, parentMap.get("Государственные выплаты")),
+                create("Подарки", "🎁", TransactionType.INCOME, user, null),
+                create("Пассивный доход", "🏠", TransactionType.INCOME, user, null),
+                create("Налоги", "💸", TransactionType.INCOME, user, parentMap.get("Возвраты")),
+                create("Долги", "🔁", TransactionType.INCOME, user, parentMap.get("Возвраты")),
+                create("Кэшбэк / Бонусы", "🎉", TransactionType.INCOME, user, null),
+                create("Продукты питания", "🍎", TransactionType.EXPENSE, user, null),
+                create("Аренда", "🏠", TransactionType.EXPENSE, user, null),
+                create("Коммунальные услуги", "💡", TransactionType.EXPENSE, user, null),
+                create("Мобильная связь / Интернет", "📶", TransactionType.EXPENSE, user, null),
+                create("Здоровье", "💊", TransactionType.EXPENSE, user, null),
+                create("Красота и уход", "💅", TransactionType.EXPENSE, user, null),
+                create("Образование / Курсы", "📚", TransactionType.EXPENSE, user, null),
+                create("Подписки", "📺", TransactionType.EXPENSE, user, null),
+                create("Подарки другим", "🎁", TransactionType.EXPENSE, user, null),
+                create("Такси", "🚕", TransactionType.EXPENSE, user, parentMap.get("Транспорт")),
+                create("Бензин", "⛽", TransactionType.EXPENSE, user, parentMap.get("Транспорт")),
+                create("Кредиты", "💳", TransactionType.EXPENSE, user, parentMap.get("Финансовые обязательства")),
+                create("Долги", "📉", TransactionType.EXPENSE, user, parentMap.get("Финансовые обязательства")),
+                create("Налоги", "💵", TransactionType.EXPENSE, user, parentMap.get("Финансовые обязательства"))
+        );
+        categoryRepository.saveAll(categories);
     }
 
-    private Category create(String name, String icon, TransactionType type, User user) {
+    private Category create(String name, String icon, TransactionType type, User user, Category parent) {
         Category category = new Category();
         category.setName(name);
         category.setIcon(icon);
         category.setType(type);
         category.setUser(user);
+        category.setParentCategory(parent);
         return category;
     }
 }
