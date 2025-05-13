@@ -26,6 +26,10 @@ public class TransactionMapper {
         dto.setPlace(transaction.getPlace());
         dto.setNote(transaction.getNote());
         dto.setType(transaction.getType());
+        dto.setRepeatEnabled(transaction.isRepeatEnabled());
+        dto.setRepeatPeriod(transaction.getRepeatPeriod());
+        dto.setRepeatEndDate(transaction.getRepeatEndDate());
+
         return dto;
     }
 
@@ -37,6 +41,9 @@ public class TransactionMapper {
         transaction.setPlace(dto.getPlace());
         transaction.setNote(dto.getNote());
         transaction.setType(dto.getType());
+        transaction.setRepeatEnabled(dto.isRepeatEnabled());
+        transaction.setRepeatPeriod(dto.getRepeatPeriod());
+        transaction.setRepeatEndDate(dto.getRepeatEndDate());
         return transaction;
     }
 }

@@ -1,5 +1,6 @@
 package KirisShygys.entity;
 
+import KirisShygys.entity.enums.RepeatPeriod;
 import KirisShygys.entity.enums.TransactionType;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -50,6 +51,16 @@ public class Transaction {
     @Enumerated(EnumType.STRING)
     @Column(name = "type", nullable = false)
     private TransactionType type;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "repeat_period")
+    private RepeatPeriod repeatPeriod;
+
+    @Column(name = "repeat_end_date")
+    private LocalDateTime repeatEndDate;
+
+    @Column(name = "is_repeat_enabled")
+    private boolean isRepeatEnabled = false;
 
     public Long getId() {
         return id;
@@ -110,5 +121,23 @@ public class Transaction {
     }
     public void setUser(User user) {
         this.user = user;
+    }
+    public RepeatPeriod getRepeatPeriod() {
+        return repeatPeriod;
+    }
+    public void setRepeatPeriod(RepeatPeriod repeatPeriod) {
+        this.repeatPeriod = repeatPeriod;
+    }
+    public LocalDateTime getRepeatEndDate() {
+        return repeatEndDate;
+    }
+    public void setRepeatEndDate(LocalDateTime repeatEndDate) {
+        this.repeatEndDate = repeatEndDate;
+    }
+    public boolean isRepeatEnabled() {
+        return isRepeatEnabled;
+    }
+    public void setRepeatEnabled(boolean repeatEnabled) {
+        isRepeatEnabled = repeatEnabled;
     }
 }

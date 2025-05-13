@@ -1,5 +1,6 @@
 package KirisShygys.dto;
 
+import KirisShygys.entity.enums.RepeatPeriod;
 import KirisShygys.entity.enums.TransactionType;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
@@ -18,6 +19,9 @@ public class TransactionDTO {
     private String place;
     private String note;
     private TransactionType type;
+    private RepeatPeriod repeatPeriod;
+    private LocalDateTime repeatEndDate;
+    private boolean isRepeatEnabled = false;
 
     public Long getId() {
         return id;
@@ -78,5 +82,23 @@ public class TransactionDTO {
     }
     public void setType(TransactionType type) {
         this.type = type;
+    }
+    public RepeatPeriod getRepeatPeriod() {
+        return repeatPeriod;
+    }
+    public void setRepeatPeriod(RepeatPeriod repeatPeriod) {
+        this.repeatPeriod = repeatPeriod;
+    }
+    public LocalDateTime getRepeatEndDate() {
+        return repeatEndDate;
+    }
+    public void setRepeatEndDate(LocalDateTime repeatEndDate) {
+        this.repeatEndDate = repeatEndDate;
+    }
+    public boolean isRepeatEnabled() {
+        return isRepeatEnabled;
+    }
+    public void setRepeatEnabled(boolean repeatEnabled) {
+        isRepeatEnabled = repeatEnabled;
     }
 }
