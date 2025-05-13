@@ -33,14 +33,19 @@ public class CategoryServiceImpl extends TransactionEntityService<Category, Long
         List<Category> categories = categoryRepository.findByUser(user);
         return categories.stream()
                 .filter(category -> category.getParentCategory() == null)
+                .filter(category -> !category.isDeleted())
                 .toList();
     }
 
     @Override
     public Category getCategoryById(String token, Long id) {
         User user = getAuthenticatedUser(token);
-        return categoryRepository.findByIdAndUser(id, user)
+        Category category = categoryRepository.findByIdAndUser(id, user)
                 .orElseThrow(() -> new NotFoundException("Category with ID " + id + " not found"));
+        if (category.isDeleted()) {
+            throw new NotFoundException("Category with ID " + id + " not found");
+        }
+        return category;
     }
 
     @Transactional
@@ -102,8 +107,14 @@ public class CategoryServiceImpl extends TransactionEntityService<Category, Long
         if (category.isSystem()) {
             throw new UnsupportedOperationException("Cannot remove the 'Uncategorized' category");
         }
-        categoryRepository.deleteByParentCategory(category);
-        categoryRepository.delete(category);
+        categoryRepository.findByUser(user).stream()
+                .filter(c -> category.equals(c.getParentCategory()))
+                .forEach(sub -> {
+                    sub.setDeleted(true);
+                    categoryRepository.save(sub);
+                });
+        category.setDeleted(true);
+        categoryRepository.save(category);
     }
 
     @Override

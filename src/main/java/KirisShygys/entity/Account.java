@@ -22,6 +22,9 @@ public class Account {
     @JsonIgnore
     private User user;
 
+    @Column(name = "is_deleted", nullable = false)
+    private boolean isDeleted = false;
+
     public Long getId() {
         return id;
     }
@@ -39,5 +42,11 @@ public class Account {
     }
     public void setUser(User user) {
         this.user = user;
+    }
+    public boolean isDeleted() {
+        return isDeleted;
+    }
+    public void setDeleted(boolean deleted) {
+        isDeleted = deleted;
     }
 }

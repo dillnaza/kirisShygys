@@ -29,9 +29,6 @@ public class Category {
     @Column(name = "type", nullable = false)
     private TransactionType type;
 
-    @Column(name = "is_system", nullable = false)
-    private boolean isSystem = false;
-
     @ManyToOne
     @JoinColumn(name = "parent_id")
     @JsonBackReference
@@ -40,6 +37,12 @@ public class Category {
     @OneToMany(mappedBy = "parentCategory", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference
     private List<Category> subCategories;
+
+    @Column(name = "is_system", nullable = false)
+    private boolean isSystem = false;
+
+    @Column(name = "is_deleted", nullable = false)
+    private boolean isDeleted = false;
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
@@ -93,5 +96,11 @@ public class Category {
     }
     public void setUser(User user) {
         this.user = user;
+    }
+    public boolean isDeleted() {
+        return isDeleted;
+    }
+    public void setDeleted(boolean deleted) {
+        isDeleted = deleted;
     }
 }
