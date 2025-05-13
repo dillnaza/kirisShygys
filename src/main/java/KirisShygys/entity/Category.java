@@ -29,6 +29,9 @@ public class Category {
     @Column(name = "type", nullable = false)
     private TransactionType type;
 
+    @Column(name = "is_system", nullable = false)
+    private boolean isSystem = false;
+
     @ManyToOne
     @JoinColumn(name = "parent_id")
     @JsonBackReference
@@ -66,6 +69,12 @@ public class Category {
     }
     public void setType(TransactionType type) {
         this.type = type;
+    }
+    public boolean isSystem() {
+        return isSystem;
+    }
+    public void setSystem(boolean system) {
+        isSystem = system;
     }
     public Category getParentCategory() {
         return parentCategory;

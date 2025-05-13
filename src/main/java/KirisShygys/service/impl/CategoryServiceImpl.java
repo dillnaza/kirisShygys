@@ -51,6 +51,7 @@ public class CategoryServiceImpl extends TransactionEntityService<Category, Long
         category.setIcon(request.getIcon());
         category.setType(request.getType());
         category.setUser(user);
+        category.setSystem(false);
         if (request.getParentCategoryId() != null) {
             Category parentCategory = categoryRepository.findById(request.getParentCategoryId())
                     .orElseThrow(() -> new NotFoundException("Parent category not found"));
@@ -71,6 +72,9 @@ public class CategoryServiceImpl extends TransactionEntityService<Category, Long
         User user = getAuthenticatedUser(token);
         Category existingCategory = categoryRepository.findByIdAndUser(id, user)
                 .orElseThrow(() -> new NotFoundException("Category with ID " + id + " not found"));
+        if (existingCategory.isSystem()) {
+            throw new UnsupportedOperationException("Category 'Without category' cannot be edited");
+        }
         existingCategory.setName(request.getName());
         existingCategory.setType(request.getType());
         existingCategory.setIcon(request.getIcon());
@@ -95,6 +99,9 @@ public class CategoryServiceImpl extends TransactionEntityService<Category, Long
         User user = getAuthenticatedUser(token);
         Category category = categoryRepository.findByIdAndUser(categoryId, user)
                 .orElseThrow(() -> new NotFoundException("Category not found"));
+        if (category.isSystem()) {
+            throw new UnsupportedOperationException("Cannot remove the 'Uncategorized' category");
+        }
         categoryRepository.deleteByParentCategory(category);
         categoryRepository.delete(category);
     }
@@ -102,51 +109,53 @@ public class CategoryServiceImpl extends TransactionEntityService<Category, Long
     @Override
     @Transactional
     public void createDefaultCategories(User user) {
+        categoryRepository.save(create("Без категории", "⦸", TransactionType.EXPENSE, user, null, true));
         Map<String, Category> parentMap = new HashMap<>();
         List<Category> parents = List.of(
-                create("Государственные выплаты", "🏛️", TransactionType.INCOME, user, null),
-                create("Возвраты", "🔄", TransactionType.INCOME, user, null),
-                create("Транспорт", "🚗", TransactionType.EXPENSE, user, null),
-                create("Финансовые обязательства", "💳", TransactionType.EXPENSE, user, null)
+                create("Государственные выплаты", "🏛️", TransactionType.INCOME, user, null, false),
+                create("Возвраты", "🔄", TransactionType.INCOME, user, null, false),
+                create("Транспорт", "🚗", TransactionType.EXPENSE, user, null, false),
+                create("Финансовые обязательства", "💳", TransactionType.EXPENSE, user, null, false)
         );
         for (Category parent : parents) {
             categoryRepository.save(parent);
             parentMap.put(parent.getName(), parent);
         }
         List<Category> categories = List.of(
-                create("Зарплата", "💼", TransactionType.INCOME, user, null),
-                create("Стипендия", "🎓", TransactionType.INCOME, user, parentMap.get("Государственные выплаты")),
-                create("Пособие", "📩", TransactionType.INCOME, user, parentMap.get("Государственные выплаты")),
-                create("Подарки", "🎁", TransactionType.INCOME, user, null),
-                create("Пассивный доход", "🏠", TransactionType.INCOME, user, null),
-                create("Налоги", "💸", TransactionType.INCOME, user, parentMap.get("Возвраты")),
-                create("Долги", "🔁", TransactionType.INCOME, user, parentMap.get("Возвраты")),
-                create("Кэшбэк / Бонусы", "🎉", TransactionType.INCOME, user, null),
-                create("Продукты питания", "🍎", TransactionType.EXPENSE, user, null),
-                create("Аренда", "🏠", TransactionType.EXPENSE, user, null),
-                create("Коммунальные услуги", "💡", TransactionType.EXPENSE, user, null),
-                create("Мобильная связь / Интернет", "📶", TransactionType.EXPENSE, user, null),
-                create("Здоровье", "💊", TransactionType.EXPENSE, user, null),
-                create("Красота и уход", "💅", TransactionType.EXPENSE, user, null),
-                create("Образование / Курсы", "📚", TransactionType.EXPENSE, user, null),
-                create("Подписки", "📺", TransactionType.EXPENSE, user, null),
-                create("Подарки другим", "🎁", TransactionType.EXPENSE, user, null),
-                create("Такси", "🚕", TransactionType.EXPENSE, user, parentMap.get("Транспорт")),
-                create("Бензин", "⛽", TransactionType.EXPENSE, user, parentMap.get("Транспорт")),
-                create("Кредиты", "💳", TransactionType.EXPENSE, user, parentMap.get("Финансовые обязательства")),
-                create("Долги", "📉", TransactionType.EXPENSE, user, parentMap.get("Финансовые обязательства")),
-                create("Налоги", "💵", TransactionType.EXPENSE, user, parentMap.get("Финансовые обязательства"))
+                create("Зарплата", "💼", TransactionType.INCOME, user, null, false),
+                create("Стипендия", "🎓", TransactionType.INCOME, user, parentMap.get("Государственные выплаты"), false),
+                create("Пособие", "📩", TransactionType.INCOME, user, parentMap.get("Государственные выплаты"), false),
+                create("Подарки", "🎁", TransactionType.INCOME, user, null, false),
+                create("Пассивный доход", "🏠", TransactionType.INCOME, user, null, false),
+                create("Налоги", "💸", TransactionType.INCOME, user, parentMap.get("Возвраты"), false),
+                create("Долги", "🔁", TransactionType.INCOME, user, parentMap.get("Возвраты"), false),
+                create("Кэшбэк / Бонусы", "🎉", TransactionType.INCOME, user, null, false),
+                create("Продукты питания", "🍎", TransactionType.EXPENSE, user, null, false),
+                create("Аренда", "🏠", TransactionType.EXPENSE, user, null, false),
+                create("Коммунальные услуги", "💡", TransactionType.EXPENSE, user, null, false),
+                create("Мобильная связь / Интернет", "📶", TransactionType.EXPENSE, user, null, false),
+                create("Здоровье", "💊", TransactionType.EXPENSE, user, null, false),
+                create("Красота и уход", "💅", TransactionType.EXPENSE, user, null, false),
+                create("Образование / Курсы", "📚", TransactionType.EXPENSE, user, null, false),
+                create("Подписки", "📺", TransactionType.EXPENSE, user, null, false),
+                create("Подарки другим", "🎁", TransactionType.EXPENSE, user, null, false),
+                create("Такси", "🚕", TransactionType.EXPENSE, user, parentMap.get("Транспорт"), false),
+                create("Бензин", "⛽", TransactionType.EXPENSE, user, parentMap.get("Транспорт"), false),
+                create("Кредиты", "💳", TransactionType.EXPENSE, user, parentMap.get("Финансовые обязательства"), false),
+                create("Долги", "📉", TransactionType.EXPENSE, user, parentMap.get("Финансовые обязательства"), false),
+                create("Налоги", "💵", TransactionType.EXPENSE, user, parentMap.get("Финансовые обязательства"), false)
         );
         categoryRepository.saveAll(categories);
     }
 
-    private Category create(String name, String icon, TransactionType type, User user, Category parent) {
+    private Category create(String name, String icon, TransactionType type, User user, Category parent, Boolean isSystem) {
         Category category = new Category();
         category.setName(name);
         category.setIcon(icon);
         category.setType(type);
         category.setUser(user);
         category.setParentCategory(parent);
+        category.setSystem(isSystem);
         return category;
     }
 }
