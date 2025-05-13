@@ -11,10 +11,11 @@ public class CategoryDTO {
     public CategoryDTO() {
     }
 
-    public CategoryDTO(Long id, String name, String icon) {
+    public CategoryDTO(Long id, String name, String icon, TransactionType type) {
         this.id = id;
         this.name = name;
         this.icon = icon;
+        this.type = type;
     }
 
     public Long getId() { return id; }

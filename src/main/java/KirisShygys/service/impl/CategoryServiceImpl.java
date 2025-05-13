@@ -49,6 +49,7 @@ public class CategoryServiceImpl extends TransactionEntityService<Category, Long
         Category category = new Category();
         category.setName(request.getName());
         category.setIcon(request.getIcon());
+        category.setType(request.getType());
         category.setUser(user);
         if (request.getParentCategoryId() != null) {
             Category parentCategory = categoryRepository.findById(request.getParentCategoryId())
@@ -71,6 +72,7 @@ public class CategoryServiceImpl extends TransactionEntityService<Category, Long
         Category existingCategory = categoryRepository.findByIdAndUser(id, user)
                 .orElseThrow(() -> new NotFoundException("Category with ID " + id + " not found"));
         existingCategory.setName(request.getName());
+        existingCategory.setType(request.getType());
         existingCategory.setIcon(request.getIcon());
         if (request.getParentCategoryId() != null) {
             Category parentCategory = categoryRepository.findById(request.getParentCategoryId())
