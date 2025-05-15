@@ -120,7 +120,7 @@ public class CategoryServiceImpl extends TransactionEntityService<Category, Long
     @Override
     @Transactional
     public void createDefaultCategories(User user) {
-        categoryRepository.save(create("Без категории", "⦸", TransactionType.EXPENSE, user, null, true));
+        categoryRepository.save(create("Без категории", "\uD83D\uDEAB", TransactionType.EXPENSE, user, null, true));
         Map<String, Category> parentMap = new HashMap<>();
         List<Category> parents = List.of(
                 create("Государственные выплаты", "🏛️", TransactionType.INCOME, user, null, false),
