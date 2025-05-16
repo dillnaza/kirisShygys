@@ -51,49 +51,25 @@ public class TransactionServiceImpl extends BaseService implements TransactionSe
     @Override
     public TransactionDTO getTransactionById(String token, Long id) {
         User user = getAuthenticatedUser(token);
-        Transaction transaction = transactionRepository.findById(id)
-                .orElseThrow(() -> {
-                    logger.warn("Transaction with ID {} not found", id);
-                    return new NotFoundException("Transaction with ID " + id + " not found");
-                });
-        if (!transaction.getUser().equals(user)) {
-            logger.warn("User {} attempted unauthorized access to transaction ID {}", user.getEmail(), id);
-            throw new UnauthorizedException("You do not have permission to access this transaction.");
-        }
+        Transaction transaction = findTransactionByIdAndCheckOwnership(id, user);
         return transactionMapper.toDto(transaction);
     }
 
     @Override
     @Transactional
-    public TransactionDTO createTransaction(TransactionDTO transactionDto, String token) {
+    public TransactionDTO createTransaction(TransactionDTO dto, String token) {
         User user = getAuthenticatedUser(token);
-        Account account = null;
-        if (transactionDto.getAccount() != null && transactionDto.getAccount().getId() != null) {
-            account = accountRepository.findById(transactionDto.getAccount().getId())
-                    .orElseThrow(() -> new NotFoundException("Account with ID " + transactionDto.getAccount().getId() + " not found"));
-            if (account.isDeleted()) {
-                throw new NotFoundException("Account is deleted");
-            }
-        }
-        Category category = categoryRepository.findById(transactionDto.getCategory().getId())
-                .orElseThrow(() -> new NotFoundException("Category with ID " + transactionDto.getCategory().getId() + " not found"));
-        if (category.isDeleted()) {
-            throw new NotFoundException("Category is deleted");
-        }
-        Tag tag = null;
-        if (transactionDto.getTag() != null && transactionDto.getTag().getId() != null) {
-            tag = tagRepository.findById(transactionDto.getTag().getId())
-                    .filter(t -> !t.isDeleted())
-                    .orElseThrow(() -> new NotFoundException("Tag with ID " + transactionDto.getTag().getId() + " not found or is deleted"));
-        }
-        Transaction transaction = transactionMapper.toEntity(transactionDto);
+        Account account = resolveAccount(dto);
+        Category category = resolveCategory(dto);
+        Tag tag = resolveTag(dto);
+        Transaction transaction = transactionMapper.toEntity(dto);
         transaction.setUser(user);
         transaction.setAccount(account);
         transaction.setCategory(category);
         transaction.setTag(tag);
-        transaction.setRepeatEnabled(transactionDto.isRepeatEnabled());
-        transaction.setRepeatPeriod(transactionDto.getRepeatPeriod());
-        transaction.setRepeatEndDate(transactionDto.getRepeatEndDate());
+        transaction.setRepeatEnabled(dto.isRepeatEnabled());
+        transaction.setRepeatPeriod(dto.getRepeatPeriod());
+        transaction.setRepeatEndDate(dto.getRepeatEndDate());
         transaction = transactionRepository.save(transaction);
         logger.info("Transaction created with ID: {} for user: {}", transaction.getId(), user.getEmail());
         return transactionMapper.toDto(transaction);
@@ -101,47 +77,20 @@ public class TransactionServiceImpl extends BaseService implements TransactionSe
 
     @Override
     @Transactional
-    public TransactionDTO updateTransaction(String token, Long id, TransactionDTO transactionDto) {
+    public TransactionDTO updateTransaction(String token, Long id, TransactionDTO dto) {
         User user = getAuthenticatedUser(token);
-        Transaction transaction = transactionRepository.findById(id)
-                .orElseThrow(() -> {
-                    logger.warn("Transaction with ID {} not found", id);
-                    return new NotFoundException("Transaction with ID " + id + " not found");
-                });
-        if (!transaction.getUser().equals(user)) {
-            logger.warn("User {} attempted unauthorized update on transaction ID {}", user.getEmail(), id);
-            throw new UnauthorizedException("You do not have permission to update this transaction.");
-        }
-        Account account = null;
-        if (transactionDto.getAccount() != null && transactionDto.getAccount().getId() != null) {
-            account = accountRepository.findById(transactionDto.getAccount().getId())
-                    .orElseThrow(() -> new NotFoundException("Account with ID " + transactionDto.getAccount().getId() + " not found"));
-            if (account.isDeleted()) {
-                throw new NotFoundException("Account is deleted");
-            }
-            transaction.setAccount(account);
-        } else {
-            transaction.setAccount(null);
-        }
-        Category category = categoryRepository.findById(transactionDto.getCategory().getId())
-                .orElseThrow(() -> new NotFoundException("Category with ID " + transactionDto.getCategory().getId() + " not found"));
-        if (category.isDeleted()) {
-            throw new NotFoundException("Category is deleted");
-        }
-        Tag tag = null;
-        if (transactionDto.getTag() != null && transactionDto.getTag().getId() != null) {
-            tag = tagRepository.findById(transactionDto.getTag().getId())
-                    .filter(t -> !t.isDeleted())
-                    .orElseThrow(() -> new NotFoundException("Tag with ID " + transactionDto.getTag().getId() + " not found or is deleted"));
-        }
-        transaction.setAmount(transactionDto.getAmount());
-        transaction.setDatetime(transactionDto.getDatetime());
-        transaction.setPlace(transactionDto.getPlace());
-        transaction.setNote(transactionDto.getNote());
-        transaction.setType(transactionDto.getType());
-        transaction.setRepeatEnabled(transactionDto.isRepeatEnabled());
-        transaction.setRepeatPeriod(transactionDto.getRepeatPeriod());
-        transaction.setRepeatEndDate(transactionDto.getRepeatEndDate());
+        Transaction transaction = findTransactionByIdAndCheckOwnership(id, user);
+        transaction.setAccount(resolveAccount(dto));
+        transaction.setCategory(resolveCategory(dto));
+        transaction.setTag(resolveTag(dto));
+        transaction.setAmount(dto.getAmount());
+        transaction.setDatetime(dto.getDatetime());
+        transaction.setPlace(dto.getPlace());
+        transaction.setNote(dto.getNote());
+        transaction.setType(dto.getType());
+        transaction.setRepeatEnabled(dto.isRepeatEnabled());
+        transaction.setRepeatPeriod(dto.getRepeatPeriod());
+        transaction.setRepeatEndDate(dto.getRepeatEndDate());
         transaction = transactionRepository.save(transaction);
         logger.info("Transaction updated with ID: {} by user: {}", id, user.getEmail());
         return transactionMapper.toDto(transaction);
@@ -151,16 +100,38 @@ public class TransactionServiceImpl extends BaseService implements TransactionSe
     @Transactional
     public void deleteTransaction(String token, Long id) {
         User user = getAuthenticatedUser(token);
-        Transaction transaction = transactionRepository.findById(id)
-                .orElseThrow(() -> {
-                    logger.warn("Transaction with ID {} not found", id);
-                    return new NotFoundException("Transaction with ID " + id + " not found");
-                });
-        if (!transaction.getUser().equals(user)) {
-            logger.warn("User {} attempted unauthorized deletion of transaction ID {}", user.getEmail(), id);
-            throw new UnauthorizedException("You do not have permission to delete this transaction.");
-        }
         transactionRepository.deleteById(id);
         logger.info("Transaction deleted with ID: {} by user: {}", id, user.getEmail());
+    }
+
+    private Transaction findTransactionByIdAndCheckOwnership(Long id, User user) {
+        Transaction transaction = transactionRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Transaction with ID " + id + " not found"));
+        if (!transaction.getUser().equals(user)) {
+            throw new UnauthorizedException("You do not have permission to access this transaction.");
+        }
+        return transaction;
+    }
+
+    private Account resolveAccount(TransactionDTO dto) {
+        if (dto.getAccount() == null || dto.getAccount().getId() == null) return null;
+        Account account = accountRepository.findById(dto.getAccount().getId())
+                .orElseThrow(() -> new NotFoundException("Account with ID " + dto.getAccount().getId() + " not found"));
+        if (account.isDeleted()) throw new NotFoundException("Account is deleted");
+        return account;
+    }
+
+    private Category resolveCategory(TransactionDTO dto) {
+        Category category = categoryRepository.findById(dto.getCategory().getId())
+                .orElseThrow(() -> new NotFoundException("Category with ID " + dto.getCategory().getId() + " not found"));
+        if (category.isDeleted()) throw new NotFoundException("Category is deleted");
+        return category;
+    }
+
+    private Tag resolveTag(TransactionDTO dto) {
+        if (dto.getTag() == null || dto.getTag().getId() == null) return null;
+        return tagRepository.findById(dto.getTag().getId())
+                .filter(t -> !t.isDeleted())
+                .orElseThrow(() -> new NotFoundException("Tag with ID " + dto.getTag().getId() + " not found or is deleted"));
     }
 }
