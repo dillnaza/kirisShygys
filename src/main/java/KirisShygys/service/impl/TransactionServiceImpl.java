@@ -67,21 +67,25 @@ public class TransactionServiceImpl extends BaseService implements TransactionSe
     @Transactional
     public TransactionDTO createTransaction(TransactionDTO transactionDto, String token) {
         User user = getAuthenticatedUser(token);
-        Account account = accountRepository.findById(transactionDto.getAccount().getId())
-                .orElseThrow(() -> new NotFoundException("Account with ID " + transactionDto.getAccount().getId() + " not found"));
-        if (account.isDeleted()) {
-            throw new NotFoundException("Account is deleted");
+        Account account = null;
+        if (transactionDto.getAccount() != null && transactionDto.getAccount().getId() != null) {
+            account = accountRepository.findById(transactionDto.getAccount().getId())
+                    .orElseThrow(() -> new NotFoundException("Account with ID " + transactionDto.getAccount().getId() + " not found"));
+            if (account.isDeleted()) {
+                throw new NotFoundException("Account is deleted");
+            }
         }
         Category category = categoryRepository.findById(transactionDto.getCategory().getId())
                 .orElseThrow(() -> new NotFoundException("Category with ID " + transactionDto.getCategory().getId() + " not found"));
         if (category.isDeleted()) {
             throw new NotFoundException("Category is deleted");
         }
-        Tag tag = (transactionDto.getTag() != null)
-                ? tagRepository.findById(transactionDto.getTag().getId())
-                .filter(t -> !t.isDeleted())
-                .orElseThrow(() -> new NotFoundException("Tag is deleted or not found"))
-                : null;
+        Tag tag = null;
+        if (transactionDto.getTag() != null && transactionDto.getTag().getId() != null) {
+            tag = tagRepository.findById(transactionDto.getTag().getId())
+                    .filter(t -> !t.isDeleted())
+                    .orElseThrow(() -> new NotFoundException("Tag with ID " + transactionDto.getTag().getId() + " not found or is deleted"));
+        }
         Transaction transaction = transactionMapper.toEntity(transactionDto);
         transaction.setUser(user);
         transaction.setAccount(account);
@@ -108,21 +112,28 @@ public class TransactionServiceImpl extends BaseService implements TransactionSe
             logger.warn("User {} attempted unauthorized update on transaction ID {}", user.getEmail(), id);
             throw new UnauthorizedException("You do not have permission to update this transaction.");
         }
-        Account account = accountRepository.findById(transactionDto.getAccount().getId())
-                .orElseThrow(() -> new NotFoundException("Account with ID " + transactionDto.getAccount().getId() + " not found"));
-        if (account.isDeleted()) {
-            throw new NotFoundException("Account is deleted");
+        Account account = null;
+        if (transactionDto.getAccount() != null && transactionDto.getAccount().getId() != null) {
+            account = accountRepository.findById(transactionDto.getAccount().getId())
+                    .orElseThrow(() -> new NotFoundException("Account with ID " + transactionDto.getAccount().getId() + " not found"));
+            if (account.isDeleted()) {
+                throw new NotFoundException("Account is deleted");
+            }
+            transaction.setAccount(account);
+        } else {
+            transaction.setAccount(null);
         }
         Category category = categoryRepository.findById(transactionDto.getCategory().getId())
                 .orElseThrow(() -> new NotFoundException("Category with ID " + transactionDto.getCategory().getId() + " not found"));
         if (category.isDeleted()) {
             throw new NotFoundException("Category is deleted");
         }
-        Tag tag = (transactionDto.getTag() != null)
-                ? tagRepository.findById(transactionDto.getTag().getId())
-                .filter(t -> !t.isDeleted())
-                .orElseThrow(() -> new NotFoundException("Tag is deleted or not found"))
-                : null;
+        Tag tag = null;
+        if (transactionDto.getTag() != null && transactionDto.getTag().getId() != null) {
+            tag = tagRepository.findById(transactionDto.getTag().getId())
+                    .filter(t -> !t.isDeleted())
+                    .orElseThrow(() -> new NotFoundException("Tag with ID " + transactionDto.getTag().getId() + " not found or is deleted"));
+        }
         transaction.setAmount(transactionDto.getAmount());
         transaction.setDatetime(transactionDto.getDatetime());
         transaction.setPlace(transactionDto.getPlace());

@@ -49,6 +49,13 @@ public class Category {
     @JsonIgnore
     private User user;
 
+    public Category() {
+    }
+
+    public Category(Long id) {
+        this.id = id;
+    }
+
     public Long getId() {
         return id;
     }

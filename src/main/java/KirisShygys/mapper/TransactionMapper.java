@@ -4,7 +4,7 @@ import KirisShygys.dto.AccountDTO;
 import KirisShygys.dto.CategoryDTO;
 import KirisShygys.dto.TagDTO;
 import KirisShygys.dto.TransactionDTO;
-import KirisShygys.entity.Transaction;
+import KirisShygys.entity.*;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -25,6 +25,7 @@ public class TransactionMapper {
         dto.setTag(transaction.getTag() != null
                 ? new TagDTO(transaction.getTag().getId(), transaction.getTag().getName())
                 : null);
+        dto.setUserId(transaction.getUser().getId());
         dto.setAmount(transaction.getAmount());
         dto.setDatetime(transaction.getDatetime());
         dto.setPlace(transaction.getPlace());
@@ -48,6 +49,21 @@ public class TransactionMapper {
         transaction.setRepeatEnabled(dto.isRepeatEnabled());
         transaction.setRepeatPeriod(dto.getRepeatPeriod());
         transaction.setRepeatEndDate(dto.getRepeatEndDate());
+        if (dto.getCategory() != null && dto.getCategory().getId() != null) {
+            transaction.setCategory(new Category(dto.getCategory().getId()));
+        } else {
+            throw new IllegalArgumentException("Category is required");
+        }
+        if (dto.getAccount() != null && dto.getAccount().getId() != null) {
+            transaction.setAccount(new Account(dto.getAccount().getId()));
+        } else {
+            transaction.setAccount(null);
+        }
+        if (dto.getTag() != null && dto.getTag().getId() != null) {
+            transaction.setTag(new Tag(dto.getTag().getId()));
+        } else {
+            transaction.setTag(null);
+        }
         return transaction;
     }
 }

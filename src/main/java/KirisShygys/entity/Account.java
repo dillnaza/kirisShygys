@@ -25,6 +25,10 @@ public class Account {
     @Column(name = "is_deleted", nullable = false)
     private boolean isDeleted = false;
 
+    public Account(Long id) {
+        this.id = id;
+    }
+
     public Long getId() {
         return id;
     }
