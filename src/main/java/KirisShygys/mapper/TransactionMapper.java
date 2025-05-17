@@ -34,7 +34,7 @@ public class TransactionMapper {
         dto.setRepeatEnabled(transaction.isRepeatEnabled());
         dto.setRepeatPeriod(transaction.getRepeatPeriod());
         dto.setRepeatEndDate(transaction.getRepeatEndDate());
-
+        dto.setPinned(transaction.isPinned());
         return dto;
     }
 
@@ -49,6 +49,7 @@ public class TransactionMapper {
         transaction.setRepeatEnabled(dto.isRepeatEnabled());
         transaction.setRepeatPeriod(dto.getRepeatPeriod());
         transaction.setRepeatEndDate(dto.getRepeatEndDate());
+        transaction.setPinned(dto.isPinned());
         if (dto.getCategory() != null && dto.getCategory().getId() != null) {
             transaction.setCategory(new Category(dto.getCategory().getId()));
         } else {

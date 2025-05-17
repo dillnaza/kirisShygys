@@ -70,6 +70,7 @@ public class TransactionServiceImpl extends BaseService implements TransactionSe
         transaction.setRepeatEnabled(dto.isRepeatEnabled());
         transaction.setRepeatPeriod(dto.getRepeatPeriod());
         transaction.setRepeatEndDate(dto.getRepeatEndDate());
+        transaction.setPinned(dto.isPinned());
         transaction = transactionRepository.save(transaction);
         logger.info("Transaction created with ID: {} for user: {}", transaction.getId(), user.getEmail());
         return transactionMapper.toDto(transaction);
@@ -91,6 +92,7 @@ public class TransactionServiceImpl extends BaseService implements TransactionSe
         transaction.setRepeatEnabled(dto.isRepeatEnabled());
         transaction.setRepeatPeriod(dto.getRepeatPeriod());
         transaction.setRepeatEndDate(dto.getRepeatEndDate());
+        transaction.setPinned(dto.isPinned());
         transaction = transactionRepository.save(transaction);
         logger.info("Transaction updated with ID: {} by user: {}", id, user.getEmail());
         return transactionMapper.toDto(transaction);

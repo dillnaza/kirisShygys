@@ -62,6 +62,9 @@ public class Transaction {
     @Column(name = "is_repeat_enabled")
     private boolean isRepeatEnabled = false;
 
+    @Column(name = "is_pinned")
+    private boolean isPinned = false;
+
     public Long getId() {
         return id;
     }
@@ -139,5 +142,11 @@ public class Transaction {
     }
     public void setRepeatEnabled(boolean repeatEnabled) {
         isRepeatEnabled = repeatEnabled;
+    }
+    public boolean isPinned() {
+        return isPinned;
+    }
+    public void setPinned(boolean pinned) {
+        isPinned = pinned;
     }
 }

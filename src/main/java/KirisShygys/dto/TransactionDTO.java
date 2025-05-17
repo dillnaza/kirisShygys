@@ -22,6 +22,7 @@ public class TransactionDTO {
     private RepeatPeriod repeatPeriod;
     private LocalDateTime repeatEndDate;
     private boolean isRepeatEnabled = false;
+    private boolean isPinned;
 
     public Long getId() {
         return id;
@@ -100,5 +101,11 @@ public class TransactionDTO {
     }
     public void setRepeatEnabled(boolean repeatEnabled) {
         isRepeatEnabled = repeatEnabled;
+    }
+    public boolean isPinned() {
+        return isPinned;
+    }
+    public void setPinned(boolean pinned) {
+        isPinned = pinned;
     }
 }
