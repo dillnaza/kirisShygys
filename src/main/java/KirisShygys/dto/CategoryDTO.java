@@ -4,22 +4,34 @@ import KirisShygys.entity.enums.TransactionType;
 
 public class CategoryDTO {
     private Long id;
-    private String name;
+    private String nameRu;
+    private String nameKz;
+    private String nameEn;
     private String icon;
     private TransactionType type;
 
     public CategoryDTO() {
     }
 
-    public CategoryDTO(Long id, String name, String icon, TransactionType type) {
+    public CategoryDTO(Long id, String nameRu, String nameKz, String nameEn, String icon, TransactionType type) {
         this.id = id;
-        this.name = name;
+        this.nameRu = nameRu;
+        this.nameKz = nameKz;
+        this.nameEn = nameEn;
         this.icon = icon;
         this.type = type;
     }
 
     public Long getId() { return id; }
-    public String getName() { return name; }
+    public String getNameRu() {
+        return nameRu;
+    }
+    public String getNameKz() {
+        return nameKz;
+    }
+    public String getNameEn() {
+        return nameEn;
+    }
     public String getIcon() { return icon; }
     public TransactionType getType() { return type; }
 }

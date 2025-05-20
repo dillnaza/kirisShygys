@@ -15,7 +15,9 @@ public class TransactionMapper {
         dto.setCategory(transaction.getCategory() != null
                 ? new CategoryDTO(
                 transaction.getCategory().getId(),
-                transaction.getCategory().getName(),
+                transaction.getCategory().getNameRu(),
+                transaction.getCategory().getNameKz(),
+                transaction.getCategory().getNameEn(),
                 transaction.getCategory().getIcon(),
                 transaction.getCategory().getType())
                 : null);

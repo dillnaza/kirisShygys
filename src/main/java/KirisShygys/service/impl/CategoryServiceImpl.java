@@ -52,7 +52,9 @@ public class CategoryServiceImpl extends TransactionEntityService<Category, Long
     public Category createCategory(String token, CategoryRequest request) {
         User user = getAuthenticatedUser(token);
         Category category = new Category();
-        category.setName(request.getName());
+        category.setNameRu(request.getNameRu());
+        category.setNameKz(request.getNameKz());
+        category.setNameEn(request.getNameEn());
         category.setIcon(request.getIcon());
         category.setType(request.getType());
         category.setUser(user);
@@ -80,7 +82,9 @@ public class CategoryServiceImpl extends TransactionEntityService<Category, Long
         if (existingCategory.isSystem()) {
             throw new UnsupportedOperationException("Category 'Without category' cannot be edited");
         }
-        existingCategory.setName(request.getName());
+        existingCategory.setNameRu(request.getNameRu());
+        existingCategory.setNameKz(request.getNameKz());
+        existingCategory.setNameEn(request.getNameEn());
         existingCategory.setType(request.getType());
         existingCategory.setIcon(request.getIcon());
         if (request.getParentCategoryId() != null) {
@@ -120,48 +124,50 @@ public class CategoryServiceImpl extends TransactionEntityService<Category, Long
     @Override
     @Transactional
     public void createDefaultCategories(User user) {
-        categoryRepository.save(create("Без категории", "\uD83D\uDEAB", TransactionType.EXPENSE, user, null, true));
+        categoryRepository.save(create("Без категории", "Санатсыз", "Uncategorized", "🚫", TransactionType.EXPENSE, user, null, true));
         Map<String, Category> parentMap = new HashMap<>();
         List<Category> parents = List.of(
-                create("Государственные выплаты", "🏛️", TransactionType.INCOME, user, null, false),
-                create("Возвраты", "🔄", TransactionType.INCOME, user, null, false),
-                create("Транспорт", "🚗", TransactionType.EXPENSE, user, null, false),
-                create("Финансовые обязательства", "💳", TransactionType.EXPENSE, user, null, false)
+                create("Государственные выплаты", "Мемлекеттік төлемдер", "Government Payments", "🏛️", TransactionType.INCOME, user, null, false),
+                create("Возвраты", "Қайтарымдар", "Returns", "🔄", TransactionType.INCOME, user, null, false),
+                create("Транспорт", "Көлік", "Transport", "🚗", TransactionType.EXPENSE, user, null, false),
+                create("Финансовые обязательства", "Қаржылық міндеттемелер", "Financial Obligations", "💳", TransactionType.EXPENSE, user, null, false)
         );
         for (Category parent : parents) {
             categoryRepository.save(parent);
-            parentMap.put(parent.getName(), parent);
+            parentMap.put(parent.getNameRu(), parent); // ключ - nameRu
         }
         List<Category> categories = List.of(
-                create("Зарплата", "💼", TransactionType.INCOME, user, null, false),
-                create("Стипендия", "🎓", TransactionType.INCOME, user, parentMap.get("Государственные выплаты"), false),
-                create("Пособие", "📩", TransactionType.INCOME, user, parentMap.get("Государственные выплаты"), false),
-                create("Подарки", "🎁", TransactionType.INCOME, user, null, false),
-                create("Пассивный доход", "🏠", TransactionType.INCOME, user, null, false),
-                create("Налоги", "💸", TransactionType.INCOME, user, parentMap.get("Возвраты"), false),
-                create("Долги", "🔁", TransactionType.INCOME, user, parentMap.get("Возвраты"), false),
-                create("Кэшбэк / Бонусы", "🎉", TransactionType.INCOME, user, null, false),
-                create("Продукты питания", "🍎", TransactionType.EXPENSE, user, null, false),
-                create("Аренда", "🏠", TransactionType.EXPENSE, user, null, false),
-                create("Коммунальные услуги", "💡", TransactionType.EXPENSE, user, null, false),
-                create("Мобильная связь / Интернет", "📶", TransactionType.EXPENSE, user, null, false),
-                create("Здоровье", "💊", TransactionType.EXPENSE, user, null, false),
-                create("Красота и уход", "💅", TransactionType.EXPENSE, user, null, false),
-                create("Образование / Курсы", "📚", TransactionType.EXPENSE, user, null, false),
-                create("Подписки", "📺", TransactionType.EXPENSE, user, null, false),
-                create("Подарки другим", "🎁", TransactionType.EXPENSE, user, null, false),
-                create("Такси", "🚕", TransactionType.EXPENSE, user, parentMap.get("Транспорт"), false),
-                create("Бензин", "⛽", TransactionType.EXPENSE, user, parentMap.get("Транспорт"), false),
-                create("Кредиты", "💳", TransactionType.EXPENSE, user, parentMap.get("Финансовые обязательства"), false),
-                create("Долги", "📉", TransactionType.EXPENSE, user, parentMap.get("Финансовые обязательства"), false),
-                create("Налоги", "💵", TransactionType.EXPENSE, user, parentMap.get("Финансовые обязательства"), false)
+                create("Зарплата", "Жалақы", "Salary", "💼", TransactionType.INCOME, user, null, false),
+                create("Стипендия", "Стипендия", "Scholarship", "🎓", TransactionType.INCOME, user, parentMap.get("Государственные выплаты"), false),
+                create("Пособие", "Жәрдемақы", "Benefit", "📩", TransactionType.INCOME, user, parentMap.get("Государственные выплаты"), false),
+                create("Подарки", "Сыйлықтар", "Gifts", "🎁", TransactionType.INCOME, user, null, false),
+                create("Пассивный доход", "Пассив табыс", "Passive Income", "🏠", TransactionType.INCOME, user, null, false),
+                create("Налоги", "Салықтар", "Taxes", "💸", TransactionType.INCOME, user, parentMap.get("Возвраты"), false),
+                create("Долги", "Қарыздар", "Debts", "🔁", TransactionType.INCOME, user, parentMap.get("Возвраты"), false),
+                create("Кэшбэк / Бонусы", "Кэшбэк / Бонустар", "Cashback / Bonuses", "🎉", TransactionType.INCOME, user, null, false),
+                create("Продукты питания", "Азық-түлік", "Groceries", "🍎", TransactionType.EXPENSE, user, null, false),
+                create("Аренда", "Жалдау", "Rent", "🏠", TransactionType.EXPENSE, user, null, false),
+                create("Коммунальные услуги", "Коммуналдық қызметтер", "Utilities", "💡", TransactionType.EXPENSE, user, null, false),
+                create("Мобильная связь / Интернет", "Мобайл / Интернет", "Mobile / Internet", "📶", TransactionType.EXPENSE, user, null, false),
+                create("Здоровье", "Денсаулық", "Health", "💊", TransactionType.EXPENSE, user, null, false),
+                create("Красота и уход", "Сұлулық және күтім", "Beauty & Care", "💅", TransactionType.EXPENSE, user, null, false),
+                create("Образование / Курсы", "Білім / Курстар", "Education / Courses", "📚", TransactionType.EXPENSE, user, null, false),
+                create("Подписки", "Жазылымдар", "Subscriptions", "📺", TransactionType.EXPENSE, user, null, false),
+                create("Подарки другим", "Басқаларға сыйлықтар", "Gifts to Others", "🎁", TransactionType.EXPENSE, user, null, false),
+                create("Такси", "Такси", "Taxi", "🚕", TransactionType.EXPENSE, user, parentMap.get("Транспорт"), false),
+                create("Бензин", "Бензин", "Gasoline", "⛽", TransactionType.EXPENSE, user, parentMap.get("Транспорт"), false),
+                create("Кредиты", "Несие", "Credits", "💳", TransactionType.EXPENSE, user, parentMap.get("Финансовые обязательства"), false),
+                create("Долги", "Қарыздар", "Debts", "📉", TransactionType.EXPENSE, user, parentMap.get("Финансовые обязательства"), false),
+                create("Налоги", "Салықтар", "Taxes", "💵", TransactionType.EXPENSE, user, parentMap.get("Финансовые обязательства"), false)
         );
         categoryRepository.saveAll(categories);
     }
 
-    private Category create(String name, String icon, TransactionType type, User user, Category parent, Boolean isSystem) {
+    private Category create(String nameRu, String nameKz, String nameEn, String icon, TransactionType type, User user, Category parent, Boolean isSystem) {
         Category category = new Category();
-        category.setName(name);
+        category.setNameRu(nameRu);
+        category.setNameKz(nameKz);
+        category.setNameEn(nameEn);
         category.setIcon(icon);
         category.setType(type);
         category.setUser(user);

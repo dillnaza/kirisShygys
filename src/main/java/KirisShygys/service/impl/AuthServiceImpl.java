@@ -107,8 +107,8 @@ public class AuthServiceImpl implements AuthService {
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(email, password)
         );
-        String accessToken = jwtUtil.generateToken(email, 60);
-        String refreshToken = jwtUtil.generateToken(email, 1440);
+        String accessToken = jwtUtil.generateToken(email, 120);
+        String refreshToken = jwtUtil.generateToken(email, 10080);
         return Map.of(
                 "accessToken", accessToken,
                 "refreshToken", refreshToken

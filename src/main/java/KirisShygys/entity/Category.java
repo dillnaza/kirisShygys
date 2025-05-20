@@ -19,8 +19,16 @@ public class Category {
     private Long id;
 
     @NotBlank(message = "Category name cannot be empty")
-    @Column(name = "name", nullable = false)
-    private String name;
+    @Column(name = "name_ru", nullable = false)
+    private String nameRu;
+
+    @NotBlank(message = "Category name cannot be empty")
+    @Column(name = "name_kz")
+    private String nameKz;
+
+    @NotBlank(message = "Category name cannot be empty")
+    @Column(name = "name_en")
+    private String nameEn;
 
     @Column(name = "icon")
     private String icon;
@@ -62,11 +70,23 @@ public class Category {
     public void setId(Long id) {
         this.id = id;
     }
-    public String getName() {
-        return name;
+    public String getNameRu() {
+        return nameRu;
     }
-    public void setName(String name) {
-        this.name = name;
+    public void setNameRu(String nameRu) {
+        this.nameRu = nameRu;
+    }
+    public String getNameKz() {
+        return nameKz;
+    }
+    public void setNameKz(String nameKz) {
+        this.nameKz = nameKz;
+    }
+    public String getNameEn() {
+        return nameEn;
+    }
+    public void setNameEn(String nameEn) {
+        this.nameEn = nameEn;
     }
     public String getIcon() {
         return icon;
