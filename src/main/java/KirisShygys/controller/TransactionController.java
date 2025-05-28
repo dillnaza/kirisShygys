@@ -4,8 +4,12 @@ import KirisShygys.dto.TransactionDTO;
 import KirisShygys.service.TransactionService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import jakarta.servlet.http.HttpServletResponse;
+
 
 import jakarta.servlet.http.HttpServletRequest;
+
+import java.io.IOException;
 import java.util.List;
 
 @RestController
@@ -51,5 +55,12 @@ public class TransactionController {
                                                   @PathVariable Long id) {
         transactionService.deleteTransaction(getAuthToken(request), id);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/export/pdf")
+    public void exportTransactionsPdf(HttpServletRequest request,
+                                      HttpServletResponse response) throws IOException {
+        String token = getAuthToken(request);
+        transactionService.exportTransactionsToPdf(token, request, response);
     }
 }
