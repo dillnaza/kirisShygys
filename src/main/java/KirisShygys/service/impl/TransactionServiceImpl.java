@@ -6,6 +6,7 @@ import KirisShygys.exception.NotFoundException;
 import KirisShygys.exception.UnauthorizedException;
 import KirisShygys.mapper.TransactionMapper;
 import KirisShygys.repository.*;
+import KirisShygys.service.StreakService;
 import KirisShygys.service.TransactionService;
 import KirisShygys.util.JwtUtil;
 import com.itextpdf.io.font.PdfEncodings;
@@ -37,6 +38,7 @@ public class TransactionServiceImpl extends BaseService implements TransactionSe
     private final TagRepository tagRepository;
     private final CategoryRepository categoryRepository;
     private final TransactionMapper transactionMapper;
+    private final StreakService streakService;
 
     public TransactionServiceImpl(TransactionRepository transactionRepository,
                                   UserRepository userRepository,
@@ -44,13 +46,15 @@ public class TransactionServiceImpl extends BaseService implements TransactionSe
                                   AccountRepository accountRepository,
                                   TagRepository tagRepository,
                                   CategoryRepository categoryRepository,
-                                  TransactionMapper transactionMapper) {
+                                  TransactionMapper transactionMapper,
+                                  StreakService streakService) {
         super(userRepository, jwtUtil);
         this.transactionRepository = transactionRepository;
         this.accountRepository = accountRepository;
         this.tagRepository = tagRepository;
         this.categoryRepository = categoryRepository;
         this.transactionMapper = transactionMapper;
+        this.streakService = streakService;
     }
 
     @Override
@@ -86,6 +90,9 @@ public class TransactionServiceImpl extends BaseService implements TransactionSe
         transaction.setPinned(dto.isPinned());
         transaction = transactionRepository.save(transaction);
         logger.info("Transaction created with ID: {} for user: {}", transaction.getId(), user.getEmail());
+        if (dto.getDatetime().toLocalDate().isEqual(java.time.LocalDate.now())) {
+            streakService.lightFireAutomatically(user.getId());
+        }
         return transactionMapper.toDto(transaction);
     }
 
