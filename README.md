@@ -1,9 +1,32 @@
-## Kiris Shyǵys
-The backend of Kiris Shyǵys is a secure, modular, and scalable financial tracking system built with **Java 17** and **Spring Boot 3.4.0**. It provides RESTful APIs for the client, enabling users to manage income and expenses, view analytics, and handle repeatable transactions.
-
 ## Tech Stack
-- **Java 17 (LTS)** — core language for server logic
-- **Spring Boot 3.4.0** — framework for REST APIs, configuration, and security
-- **PostgreSQL** — relational database for storing user data
-- **Spring Security + JWT + OAuth2** — user authentication and access control
-- **Spring Data JPA** — database access layer
+
+### Backend
+- **Java 17**
+- **Spring Boot 3.4.0**
+- **Spring Web (MVC)**
+- **Spring Data JPA + Hibernate**
+- **Spring Security + OAuth 2.0 Client**
+- **Spring Mail**
+- **HikariCP**
+
+### Database
+- **PostgreSQL 16.9**
+
+### Authentication / Security
+- **JWT (JSON Web Tokens)**
+- **Google OAuth 2.0**
+- **BCryptPasswordEncoder**
+
+### Tools & Libraries
+- **Maven** – build & dependency management  
+- **Lombok** – auto-generation of boilerplate code  
+- **Hibernate Validator / Jakarta Validation** – input validation  
+- **JavaDotenv** – load secrets from `.env`  
+- **Spring DevTools** – hot reload during development  
+
+### Documentation & Testing
+- **Swagger (Springfox 3.0)** – interactive API docs  
+- **JUnit 5 + Spring Boot Test** – testing framework  
+
+### PDF Export
+- **iText 7 (layout + kernel)** – dynamic PDF report generation  
