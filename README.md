@@ -41,20 +41,17 @@
 
 Многоуровневая структура с разделением ответственности:
 
-- KirisShygys/
-- ├── controller/ # REST-контроллеры
-- ├── service/ # Бизнес-логика (Auth, Transaction, Category, Balance, Tag, Streak и др.)
-- ├── repository/ # Spring Data JPA репозитории
-- ├── entity/ # JPA-сущности (User, Transaction, Category, Tag, Account и др.)
-- ├── dto/ # DTO для обмена данными между слоями
-- ├── mapper/ # Мапперы Entity ↔ DTO
-- ├── util/ # JWT и вспомогательные классы
-- ├── filter/ # JwtAuthenticationFilter
-- ├── interceptor/ # AuthInterceptor
-- ├── exception/ # Кастомные исключения и глобальный обработчик
-- └── resources/
-- ├── fonts/ # Шрифты для PDF
-- └── application.yml
+- `controller/` — REST-контроллеры
+- `service/` — бизнес-логика (Auth, Transaction, Category, Balance, Tag, Streak и др.)
+- `repository/` — Spring Data JPA репозитории
+- `entity/` — JPA-сущности (User, Transaction, Category, Tag, Account и др.)
+- `dto/` — DTO для обмена данными между слоями
+- `mapper/` — мапперы Entity ↔ DTO
+- `util/` — JWT и вспомогательные классы
+- `filter/` — JwtAuthenticationFilter
+- `interceptor/` — AuthInterceptor
+- `exception/` — кастомные исключения и глобальный обработчик
+- `resources/` — статические файлы, конфигурации и шрифты для PDF
 
 
 Основные сервисы:
