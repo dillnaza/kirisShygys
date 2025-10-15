@@ -1,13 +1,27 @@
-# Используем официальный образ Maven
-FROM maven:3.9.4-eclipse-temurin-17 AS build
-WORKDIR /app
-COPY . .
-RUN mvn clean package -DskipTests
+version: '3.9'
+services:
+  app:
+    build: .
+    container_name: kiris_app
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/kiris
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+  db:
+    image: postgres:15
+    container_name: kiris_db
+    environment:
+      POSTGRES_DB: kiris
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - kiris_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
 
-# Используем минимальный Java-образ для запуска
-FROM eclipse-temurin:17-jdk
-WORKDIR /app
-COPY --from=build /app/target/*.jar app.jar
-
-EXPOSE 8080
-ENTRYPOINT ["java", "-jar", "app.jar"]
+volumes:
+  kiris_data:
